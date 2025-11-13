@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕍 הערכת זמן חזרה משבת</title>
+    
+    <meta name="description" content="מערכת חכמה עם למידת מכונה לחיזוי זמן חזרה מבית הכנסת">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="זמן חזרה משבת">
+    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E🕍%3C/text%3E%3C/svg%3E">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .prediction-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+
+        .loading-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-indicator.loading::before {
+            content: "⟳";
+            animation: spin 1s linear infinite;
+        }
+
+        .parsha-name {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .verses-count {
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .time-display {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .duration {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .confidence {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .ai-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .ai-indicator::before {
+            content: "🧠";
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .history-item {
+            padding: 15px;
+            border-right: 4px solid #667eea;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .history-parsha {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .history-date {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .history-times {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .error-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .error-positive {
+            background: #ffe0e0;
+            color: #d32f2f;
+        }
+
+        .error-negative {
+            background: #e0f2f1;
+            color: #00897b;
+        }
+
+        .error-zero {
+            background: #e8f5e9;
+            color: #43a047;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .learning-progress {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .learning-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .offset-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .offset-item:last-child {
+            border-bottom: none;
+        }
+
+        .offset-label {
+            color: #666;
+        }
+
+        .offset-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .refresh-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🕍 הערכת זמן חזרה משבת</h1>
+            <p>מערכת חכמה עם למידת מכונה 🧠</p>
+        </div>
+
+        <div class="card prediction-card">
+            <div class="loading-indicator" id="loadingIndicator"></div>
+            
+            <div class="parsha-name" id="currentParsha">טוען...</div>
+            <div class="verses-count" id="versesCount">- פסוקים</div>
+            <div class="time-display" id="predictedTime">--:--</div>
+            <div class="duration" id="duration">משך משוער: -- דקות</div>
+            <div class="confidence" id="confidence">רמת ביטחון: נמוכה</div>
+            <div class="ai-indicator" id="aiIndicator">המערכת לומדת מהכיוונונים שלך</div>
+            
+            <button class="refresh-btn" onclick="loadCurrentParsha(true)">🔄 רענן לפרשה הבאה</button>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('calibrate')">כיוונון</button>
+                <button class="tab" onclick="switchTab('history')">היסטוריה</button>
+                <button class="tab" onclick="switchTab('parshiot')">פרשות</button>
+                <button class="tab" onclick="switchTab('settings')">הגדרות</button>
+            </div>
+
+            <div id="calibrateTab">
+                <div class="section-title">🔧 כיוונון זמן חזרה</div>
+
+                <div class="input-group">
+                    <label for="actualTime">מתי בפועל חזרת?</label>
+                    <input type="time" id="actualTime" value="10:15">
+                </div>
+
+                <button class="btn btn-primary" onclick="saveCalibration()">💾 שמור כיוונון</button>
+
+                <div class="learning-progress">
+                    <div class="learning-title">🧠 מה המערכת למדה עד כה</div>
+                    <div class="offset-item">
+                        <span class="offset-label">קיזוז גלובלי</span>
+                        <span class="offset-value" id="globalOffsetDisplay">0 דק'</span>
+                    </div>
+                    <div class="offset-item">
+                        <span class="offset-label">פרשות קצרות (&lt;80)</span>
+                        <span class="offset-value" id="shortOffsetDisplay">0 דק'</span>
+                    </div>
+                    <div class="offset-item">
+                        <span class="offset-label">פרשות בינוניות (80-140)</span>
+                        <span class="offset-value" id="mediumOffsetDisplay">0 דק'</span>
+                    </div>
+                    <div class="offset-item">
+                        <span class="offset-label">פרשות ארוכות (140-180)</span>
+                        <span class="offset-value" id="longOffsetDisplay">0 דק'</span>
+                    </div>
+                    <div class="offset-item">
+                        <span class="offset-label">פרשות ארוכות מאוד (&gt;180)</span>
+                        <span class="offset-value" id="veryLongOffsetDisplay">0 דק'</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="resetData()">🔄 איפוס נתונים</button>
+            </div>
+
+            <div id="historyTab" class="hidden">
+                <div class="section-title">📊 היסטוריית כיוונונים</div>
+                <div id="historyList"></div>
+            </div>
+
+            <div id="parshiotTab" class="hidden">
+                <div class="section-title">📖 רשימת פרשות השנה</div>
+                <div id="parshiotList"></div>
+            </div>
+
+            <div id="settingsTab" class="hidden">
+                <div class="section-title">⚙️ הגדרות</div>
+
+                <div class="input-group">
+                    <label for="startTime">שעת התחלת תפילה</label>
+                    <input type="time" id="startTime" value="08:00" onchange="saveSettings()">
+                </div>
+
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="totalCalibrations">0</div>
+                        <div class="stat-label">כיוונונים</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="avgError">0</div>
+                        <div class="stat-label">דיוק ממוצע (דק')</div>
+                    </div>
+                </div>
+
+                <div class="learning-progress" style="margin-top: 20px;">
+                    <div class="learning-title">ℹ️ איך המערכת לומדת?</div>
+                    <p style="color: #666; font-size: 0.9em; line-height: 1.6;">
+                        המערכת משתמשת באלגוריתם למידה שמתעדכן אחרי כל כיוונון:
+                        <br><br>
+                        <strong>קיזוז גלובלי:</strong> משפיע על כל הפרשות (30% מהשגיאה)
+                        <br>
+                        <strong>קיזוז קטגוריה:</strong> משפיע רק על פרשות באותו אורך (20% מהשגיאה)
+                        <br><br>
+                        ככל שתכייל יותר, החיזויים יהיו מדויקים יותר! 🎯
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PARSHIOT = {
+            "בראשית": 146, "נח": 153, "לך לך": 126, "וירא": 147,
+            "חיי שרה": 105, "תולדות": 106, "ויצא": 148, "וישלח": 153,
+            "וישב": 112, "מקץ": 146, "ויגש": 106, "ויחי": 85,
+            "שמות": 124, "וארא": 121, "בא": 105, "בשלח": 116,
+            "יתרו": 72, "משפטים": 118, "תרומה": 96, "תצוה": 101,
+            "כי תשא": 139, "ויקהל": 122, "פקודי": 92, "ויקהל-פקודי": 214,
+            "ויקרא": 111, "צו": 97, "שמיני": 91, "תזריע": 67,
+            "מצורע": 90, "תזריע-מצורע": 157, "אחרי מות": 80, "קדושים": 64,
+            "אחרי מות-קדושים": 144, "אמור": 124, "בהר": 57, "בחוקתי": 78,
+            "בהר-בחוקתי": 135, "במדבר": 159, "נשא": 176, "בהעלותך": 136,
+            "שלח": 119, "קרח": 95, "חקת": 87, "בלק": 104, "חקת-בלק": 191,
+            "פינחס": 168, "מטות": 112, "מסעי": 132, "מטות-מסעי": 244,
+            "דברים": 105, "ואתחנן": 122, "עקב": 111, "ראה": 126,
+            "שופטים": 97, "כי תצא": 110, "כי תבוא": 122, "נצבים": 40,
+            "וילך": 30, "נצבים-וילך": 70, "האזינו": 52, "וזאת הברכה": 41
+        };
+
+        let currentParsha = null;
+        let appData = {
+            baseMinutesPerVerse: 0.918,
+            globalOffset: 0,
+            categoryOffsets: { short: 0, medium: 0, long: 0, very_long: 0 },
+            startTime: "08:00",
+            history: [],
+            calibrationCount: 0,
+            savedParsha: null,
+            savedParshaDate: null
+        };
+
+        function loadData() {
+            const saved = localStorage.getItem('shabbatReturnData');
+            if (saved) appData = { ...appData, ...JSON.parse(saved) };
+        }
+
+        function saveData() {
+            localStorage.setItem('shabbatReturnData', JSON.stringify(appData));
+        }
+
+        function getCategory(verses) {
+            if (verses < 80) return 'short';
+            if (verses < 140) return 'medium';
+            if (verses < 180) return 'long';
+            return 'very_long';
+        }
+
+        async function loadCurrentParsha(force = false) {
+            const indicator = document.getElementById('loadingIndicator');
+            
+            if (!force && appData.savedParsha && appData.savedParshaDate) {
+                const savedDate = new Date(appData.savedParshaDate);
+                const now = new Date();
+                const dayOfWeek = now.getDay();
+                const lastSunday = new Date(now);
+                lastSunday.setDate(now.getDate() - dayOfWeek);
+                lastSunday.setHours(0, 0, 0, 0);
+                
+                if (savedDate >= lastSunday) {
+                    currentParsha = appData.savedParsha;
+                    indicator.textContent = '📌 פרשה נוכחית';
+                    setTimeout(() => indicator.textContent = '', 3000);
+                    updatePrediction();
+                    return;
+                }
+            }
+            
+            indicator.textContent = 'טוען פרשה חדשה...';
+            indicator.classList.add('loading');
+
+            try {
+                let response;
+                try {
+                    response = await fetch('https://www.hebcal.com/shabbat?cfg=json&geonameid=293397&M=on&lg=h');
+                } catch (e) {
+                    response = await fetch('https://corsproxy.io/?https://www.hebcal.com/shabbat?cfg=json&geonameid=293397&M=on&lg=h');
+                }
+                
+                const data = await response.json();
+                const parshaItem = data.items.find(item => item.category === 'parashat');
+                
+                if (parshaItem) {
+                    let parshaName = parshaItem.hebrew.replace('פרשת ', '').replace('־', '-');
+                    currentParsha = parshaName;
+                    appData.savedParsha = parshaName;
+                    appData.savedParshaDate = new Date().toISOString();
+                    saveData();
+                    
+                    indicator.textContent = '✓ עודכן';
+                    indicator.classList.remove('loading');
+                    setTimeout(() => indicator.textContent = '', 2000);
+                    updatePrediction();
+                } else {
+                    throw new Error('לא נמצאה פרשת שבוע');
+                }
+            } catch (error) {
+                console.error('Error loading parsha:', error);
+                indicator.textContent = '⚠️ שגיאה';
+                indicator.classList.remove('loading');
+                document.getElementById('currentParsha').textContent = 'שגיאה בטעינה';
+                document.getElementById('versesCount').textContent = 'לחץ רענן לנסות שוב';
+            }
+        }
+
+        function calculatePrediction(parsha) {
+            const verses = PARSHIOT[parsha];
+            if (!verses) return null;
+            const category = getCategory(verses);
+            const categoryOffset = appData.categoryOffsets[category] || 0;
+            const totalMinutes = (verses * appData.baseMinutesPerVerse) + appData.globalOffset + categoryOffset;
+            const [startHour, startMin] = appData.startTime.split(':').map(Number);
+            const startTotalMin = startHour * 60 + startMin;
+            const endTotalMin = startTotalMin + Math.round(totalMinutes);
+            const endHour = Math.floor(endTotalMin / 60);
+            const endMin = endTotalMin % 60;
+            return {
+                time: `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`,
+                duration: Math.round(totalMinutes),
+                verses: verses,
+                category: category
+            };
+        }
+
+        function updatePrediction() {
+            if (!currentParsha) return;
+            const prediction = calculatePrediction(currentParsha);
+            if (prediction) {
+                document.getElementById('currentParsha').textContent = `פרשת ${currentParsha}`;
+                document.getElementById('versesCount').textContent = `${prediction.verses} פסוקים`;
+                document.getElementById('predictedTime').textContent = prediction.time;
+                document.getElementById('duration').textContent = `משך משוער: ${prediction.duration} דקות`;
+                
+                let confidence = 'נמוכה (צריך עוד כיוונונים)';
+                if (appData.calibrationCount >= 10) confidence = 'גבוהה 🎯';
+                else if (appData.calibrationCount >= 5) confidence = 'בינונית 📈';
+                else if (appData.calibrationCount >= 2) confidence = 'נמוכה-בינונית';
+                document.getElementById('confidence').textContent = `רמת ביטחון: ${confidence}`;
+
+                if (appData.calibrationCount === 0) {
+                    document.getElementById('aiIndicator').textContent = 'המערכת מחכה לכיוונון ראשון';
+                } else {
+                    const totalOffset = Math.abs(appData.globalOffset + (appData.categoryOffsets[prediction.category] || 0));
+                    document.getElementById('aiIndicator').textContent = `המערכת למדה ${totalOffset.toFixed(1)} דק' תיקון (${appData.calibrationCount} כיוונונים)`;
+                }
+                updateLearningDisplay();
+            }
+        }
+
+        function updateLearningDisplay() {
+            document.getElementById('globalOffsetDisplay').textContent = `${appData.globalOffset >= 0 ? '+' : ''}${appData.globalOffset.toFixed(1)} דק'`;
+            document.getElementById('shortOffsetDisplay').textContent = `${appData.categoryOffsets.short >= 0 ? '+' : ''}${appData.categoryOffsets.short.toFixed(1)} דק'`;
+            document.getElementById('mediumOffsetDisplay').textContent = `${appData.categoryOffsets.medium >= 0 ? '+' : ''}${appData.categoryOffsets.medium.toFixed(1)} דק'`;
+            document.getElementById('longOffsetDisplay').textContent = `${appData.categoryOffsets.long >= 0 ? '+' : ''}${appData.categoryOffsets.long.toFixed(1)} דק'`;
+            document.getElementById('veryLongOffsetDisplay').textContent = `${appData.categoryOffsets.very_long >= 0 ? '+' : ''}${appData.categoryOffsets.very_long.toFixed(1)} דק'`;
+        }
+
+        function saveCalibration() {
+            if (!currentParsha) {
+                alert('אנא המתן לטעינת פרשת השבוע');
+                return;
+            }
+            const actualTime = document.getElementById('actualTime').value;
+            if (!actualTime) {
+                alert('נא להזין זמן חזרה בפועל');
+                return;
+            }
+            const prediction = calculatePrediction(currentParsha);
+            if (!prediction) return;
+            const [predHour, predMin] = prediction.time.split(':').map(Number);
+            const [actHour, actMin] = actualTime.split(':').map(Number);
+            const errorMinutes = (actHour * 60 + actMin) - (predHour * 60 + predMin);
+            const GLOBAL_RATE = 0.3;
+            const CATEGORY_RATE = 0.2;
+            appData.globalOffset += errorMinutes * GLOBAL_RATE;
+            appData.categoryOffsets[prediction.category] += errorMinutes * CATEGORY_RATE;
+            appData.calibrationCount++;
+            appData.history.unshift({
+                date: new Date().toISOString().split('T')[0],
+                parsha: currentParsha,
+                predicted: prediction.time,
+                actual: actualTime,
+                error: errorMinutes
+            });
+            if (appData.history.length > 52) appData.history = appData.history.slice(0, 52);
+            saveData();
+            updatePrediction();
+            updateHistory();
+            updateStats();
+            alert(`✅ כיוונון נשמר בהצלחה!\n\nשגיאה: ${errorMinutes > 0 ? '+' : ''}${errorMinutes} דקות\n\nהמערכת למדה ועדכנה את החיזויים הבאים! 🧠`);
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById('historyList');
+            if (appData.history.length === 0) {
+                historyList.innerHTML = '<div class="empty-state"><p>אין עדיין היסטוריה</p><p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל את המערכת כדי לראות נתונים כאן</p></div>';
+                return;
+            }
+            historyList.innerHTML = appData.history.map(item => {
+                let errorClass = 'error-zero';
+                if (item.error > 0) errorClass = 'error-positive';
+                else if (item.error < 0) errorClass = 'error-negative';
+                return `<div class="history-item"><div class="history-item-header"><span class="history-parsha">${item.parsha}</span><span class="history-date">${item.date}</span></div><div class="history-times">חיזוי: ${item.predicted} | בפועל: ${item.actual}<span class="error-badge ${errorClass}">${item.error > 0 ? '+' : ''}${item.error} דק'</span></div></div>`;
+            }).join('');
+        }
+
+        function updateParshiotList() {
+            const parshiotList = document.getElementById('parshiotList');
+            const parshiotByBook = {
+                'בראשית': ['בראשית', 'נח', 'לך לך', 'וירא', 'חיי שרה', 'תולדות', 'ויצא', 'וישלח', 'וישב', 'מקץ', 'ויגש', 'ויחי'],
+                'שמות': ['שמות', 'וארא', 'בא', 'בשלח', 'יתרו', 'משפטים', 'תרומה', 'תצוה', 'כי תשא', 'ויקהל', 'פקודי', 'ויקהל-פקודי'],
+                'ויקרא': ['ויקרא', 'צו', 'שמיני', 'תזריע', 'מצורע', 'תזריע-מצורע', 'אחרי מות', 'קדושים', 'אחרי מות-קדושים', 'אמור', 'בהר', 'בחוקתי', 'בהר-בחוקתי'],
+                'במדבר': ['במדבר', 'נשא', 'בהעלותך', 'שלח', 'קרח', 'חקת', 'בלק', 'חקת-בלק', 'פינחס', 'מטות','מסעי', 'מטות-מסעי'],
+                'דברים': ['דברים', 'ואתחנן', 'עקב', 'ראה', 'שופטים', 'כי תצא', 'כי תבוא', 'נצבים', 'וילך', 'נצבים-וילך', 'האזינו', 'וזאת הברכה']
+            };
+            let html = '';
+            for (const [book, parshiot] of Object.entries(parshiotByBook)) {
+                html += `<div class="learning-progress" style="margin-bottom: 15px;"><div class="learning-title">📘 ${book}</div>`;
+                parshiot.forEach(parsha => {
+                    const verses = PARSHIOT[parsha];
+                    if (verses) {
+                        const isCurrent = parsha === currentParsha;
+                        html += `<div class="offset-item" style="${isCurrent ? 'background: #e3f2fd; font-weight: bold;' : ''}"><span class="offset-label">${isCurrent ? '👉 ' : ''}${parsha}</span><span class="offset-value">${verses} פסוקים</span></div>`;
+                    }
+                });
+                html += `</div>`;
+            }
+            parshiotList.innerHTML = html;
+        }
+
+        function updateStats() {
+            document.getElementById('totalCalibrations').textContent = appData.calibrationCount;
+            if (appData.history.length > 0) {
+                const avgError = Math.abs(appData.history.reduce((sum, item) => sum + Math.abs(item.error), 0) / appData.history.length).toFixed(1);
+                document.getElementById('avgError').textContent = avgError;
+            } else {
+                document.getElementById('avgError').textContent = '0';
+            }
+        }
+
+        function saveSettings() {
+            appData.startTime = document.getElementById('startTime').value;
+            saveData();
+            updatePrediction();
+        }
+
+        function resetData() {
+            if (confirm('האם אתה בטוח שברצונך למחוק את כל הנתונים?\n\nזה ימחק את כל הכיוונונים וההיסטוריה!')) {
+                localStorage.removeItem('shabbatReturnData');
+                appData = {
+                    baseMinutesPerVerse: 0.918,
+                    globalOffset: 0,
+                    categoryOffsets: { short: 0, medium: 0, long: 0, very_long: 0 },
+                    startTime: "08:00",
+                    history: [],
+                    calibrationCount: 0,
+                    savedParsha: null,
+                    savedParshaDate: null
+                };
+                init();
+                alert('✅ הנתונים אופסו בהצלחה');
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('calibrateTab').classList.add('hidden');
+            document.getElementById('historyTab').classList.add('hidden');
+            document.getElementById('parshiotTab').classList.add('hidden');
+            document.getElementById('settingsTab').classList.add('hidden');
+            if (tab === 'calibrate') {
+                document.getElementById('calibrateTab').classList.remove('hidden');
+            } else if (tab === 'history') {
+                document.getElementById('historyTab').classList.remove('hidden');
+                updateHistory();
+            } else if (tab === 'parshiot') {
+                document.getElementById('parshiotTab').classList.remove('hidden');
+                updateParshiotList();
+            } else if (tab === 'settings') {
+                document.getElementById('settingsTab').classList.remove('hidden');
+                updateStats();
+            }
+        }
+
+        function init() {
+            loadData();
+            document.getElementById('startTime').value = appData.startTime;
+            updateLearningDisplay();
+            updateHistory();
+            updateStats();
+            loadCurrentParsha();
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
