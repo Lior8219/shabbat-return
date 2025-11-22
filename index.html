@@ -511,6 +511,7 @@
         async function loadCurrentParsha(force = false) {
             const indicator = document.getElementById('loadingIndicator');
             
+            // אם לא מאלצים רענון - בדוק אם יש פרשה שמורה
             if (!force && appData.savedParsha && appData.savedParshaDate) {
                 const savedDate = new Date(appData.savedParshaDate);
                 const now = new Date();
@@ -528,7 +529,8 @@
                 }
             }
             
-            indicator.textContent = 'טוען פרשה חדשה...';
+            // אם הגענו לכאן - טוען פרשה חדשה (או כי force=true או כי עבר שבוע)
+            indicator.textContent = force ? 'מעדכן לפרשה הבאה...' : 'טוען פרשה חדשה...';
             indicator.classList.add('loading');
 
             try {
