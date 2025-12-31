@@ -655,19 +655,153 @@
             alert(`✅ כיוונון נשמר בהצלחה!\n\nשגיאה: ${errorMinutes > 0 ? '+' : ''}${errorMinutes} דקות\n\nהמערכת למדה ועדכנה את החיזויים הבאים! 🧠`);
         }
 
-        function updateHistory() {
-            const historyList = document.getElementById('historyList');
-            if (appData.history.length === 0) {
-                historyList.innerHTML = '<div class="empty-state"><p>אין עדיין היסטוריה</p><p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל את המערכת כדי לראות נתונים כאן</p></div>';
-                return;
-            }
-            historyList.innerHTML = appData.history.map(item => {
-                let errorClass = 'error-zero';
-                if (item.error > 0) errorClass = 'error-positive';
-                else if (item.error < 0) errorClass = 'error-negative';
-                return `<div class="history-item"><div class="history-item-header"><span class="history-parsha">${item.parsha}</span><span class="history-date">${item.date}</span></div><div class="history-times">חיזוי: ${item.predicted} | בפועל: ${item.actual}<span class="error-badge ${errorClass}">${item.error > 0 ? '+' : ''}${item.error} דק'</span></div></div>`;
-            }).join('');
-        }
+// ========================================
+// שים את הקוד הזה במקום הפונקציה updateHistory() הקיימת
+// ========================================
+
+function updateHistory() {
+    const historyList = document.getElementById('historyList');
+    
+    if (appData.history.length === 0) {
+        historyList.innerHTML = '<div class="empty-state"><p>אין עדיין היסטוריה</p><p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל את המערכת כדי לראות נתונים כאן</p></div>';
+        return;
+    }
+
+    historyList.innerHTML = appData.history.map((item, index) => {
+        let errorClass = 'error-zero';
+        if (item.error > 0) errorClass = 'error-positive';
+        else if (item.error < 0) errorClass = 'error-negative';
+
+        return `
+            <div class="history-item">
+                <div class="history-item-header">
+                    <span class="history-parsha">${item.parsha}</span>
+                    <span class="history-date">${item.date}</span>
+                </div>
+                <div class="history-times">
+                    חיזוי: ${item.predicted} | בפועל: ${item.actual}
+                    <span class="error-badge ${errorClass}">
+                        ${item.error > 0 ? '+' : ''}${item.error} דק'
+                    </span>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button onclick="editHistoryItem(${index})" style="flex: 1; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        ✏️ ערוך
+                    </button>
+                    <button onclick="deleteHistoryItem(${index})" style="flex: 1; padding: 8px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        🗑️ מחק
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ========================================
+// פונקציה למחיקת רשומה
+// ========================================
+
+function deleteHistoryItem(index) {
+    const item = appData.history[index];
+    
+    if (!confirm(`האם למחוק את הכיוונון?\n\nפרשת ${item.parsha}\nתאריך: ${item.date}\nשגיאה: ${item.error > 0 ? '+' : ''}${item.error} דקות\n\nשים לב: הקיזוזים יחושבו מחדש!`)) {
+        return;
+    }
+
+    // מחיקת הרשומה
+    appData.history.splice(index, 1);
+    appData.calibrationCount = appData.history.length;
+
+    // חישוב מחדש של כל הקיזוזים
+    recalculateOffsets();
+
+    // שמירה ועדכון תצוגה
+    saveData();
+    updateHistory();
+    updateStats();
+    updateLearningDisplay();
+    updatePrediction();
+
+    alert('✅ הרשומה נמחקה והקיזוזים חושבו מחדש!');
+}
+
+// ========================================
+// פונקציה לעריכת רשומה
+// ========================================
+
+function editHistoryItem(index) {
+    const item = appData.history[index];
+    
+    const newTime = prompt(
+        `עריכת זמן חזרה בפועל\n\nפרשת ${item.parsha} (${item.date})\n\nזמן נוכחי: ${item.actual}\nהזן זמן חדש (פורמט: HH:MM):`,
+        item.actual
+    );
+
+    if (!newTime) return; // ביטול
+
+    // בדיקת פורמט
+    if (!/^\d{2}:\d{2}$/.test(newTime)) {
+        alert('❌ פורמט לא תקין! השתמש ב: HH:MM (לדוגמה: 09:47)');
+        return;
+    }
+
+    // חישוב שגיאה חדשה
+    const [predHour, predMin] = item.predicted.split(':').map(Number);
+    const [actHour, actMin] = newTime.split(':').map(Number);
+    const newError = (actHour * 60 + actMin) - (predHour * 60 + predMin);
+
+    // עדכון הרשומה
+    appData.history[index].actual = newTime;
+    appData.history[index].error = newError;
+
+    // חישוב מחדש של כל הקיזוזים
+    recalculateOffsets();
+
+    // שמירה ועדכון תצוגה
+    saveData();
+    updateHistory();
+    updateStats();
+    updateLearningDisplay();
+    updatePrediction();
+
+    alert(`✅ הרשומה עודכנה!\n\nשגיאה חדשה: ${newError > 0 ? '+' : ''}${newError} דקות\nהקיזוזים חושבו מחדש!`);
+}
+
+// ========================================
+// פונקציה לחישוב מחדש של כל הקיזוזים
+// ========================================
+
+function recalculateOffsets() {
+    // איפוס הקיזוזים
+    appData.globalOffset = 0;
+    appData.categoryOffsets = { short: 0, medium: 0, long: 0, very_long: 0 };
+
+    // מעבר על כל ההיסטוריה מהסוף להתחלה (מהישן לחדש)
+    const reversedHistory = [...appData.history].reverse();
+    
+    for (const item of reversedHistory) {
+        // דילוג על הכיוונון הראשוני (וירא)
+        if (item.notes === "Initial calibration") continue;
+
+        // חישוב קטגוריה
+        const verses = PARSHIOT[item.parsha];
+        if (!verses) continue;
+        
+        const category = getCategory(verses);
+        const errorMinutes = item.error;
+
+        // עדכון קיזוזים
+        const GLOBAL_RATE = 0.3;
+        const CATEGORY_RATE = 0.2;
+        
+        appData.globalOffset += errorMinutes * GLOBAL_RATE;
+        appData.categoryOffsets[category] += errorMinutes * CATEGORY_RATE;
+    }
+}
+
+// ========================================
+// הוסף את הפונקציות האלה לפני window.addEventListener
+// ========================================
 
         function updateParshiotList() {
             const parshiotList = document.getElementById('parshiotList');
