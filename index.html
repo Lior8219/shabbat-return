@@ -197,6 +197,17 @@
             background: #f9f9f9;
             border-radius: 10px;
             margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: #f0f0f0;
+            transform: translateX(-5px);
+        }
+
+        .history-item:active {
+            transform: scale(0.98);
         }
 
         .history-item-header {
@@ -663,17 +674,31 @@ function updateHistory() {
     const historyList = document.getElementById('historyList');
     
     if (appData.history.length === 0) {
-        historyList.innerHTML = '<div class="empty-state"><p>אין עדיין היסטוריה</p><p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל את המערכת כדי לראות נתונים כאן</p></div>';
+        historyList.innerHTML = `
+            <button onclick="showAddCalibrationDialog()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-bottom: 20px;">
+                ➕ הוסף כיוונון ישן
+            </button>
+            <div class="empty-state">
+                <p>אין עדיין היסטוריה</p>
+                <p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל את המערכת או הוסף כיוונון ישן</p>
+            </div>
+        `;
         return;
     }
 
-    historyList.innerHTML = appData.history.map((item, index) => {
+    let html = `
+        <button onclick="showAddCalibrationDialog()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-bottom: 20px;">
+            ➕ הוסף כיוונון ישן
+        </button>
+    `;
+
+    html += appData.history.map((item, index) => {
         let errorClass = 'error-zero';
         if (item.error > 0) errorClass = 'error-positive';
         else if (item.error < 0) errorClass = 'error-negative';
 
         return `
-            <div class="history-item">
+            <div class="history-item" onclick="showHistoryOptions(${index})" style="cursor: pointer; transition: transform 0.2s;">
                 <div class="history-item-header">
                     <span class="history-parsha">${item.parsha}</span>
                     <span class="history-date">${item.date}</span>
@@ -684,23 +709,134 @@ function updateHistory() {
                         ${item.error > 0 ? '+' : ''}${item.error} דק'
                     </span>
                 </div>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button onclick="editHistoryItem(${index})" style="flex: 1; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                        ✏️ ערוך
-                    </button>
-                    <button onclick="deleteHistoryItem(${index})" style="flex: 1; padding: 8px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                        🗑️ מחק
-                    </button>
-                </div>
+                <div style="font-size: 0.85em; color: #999; margin-top: 5px;">👆 לחץ לעריכה או מחיקה</div>
             </div>
         `;
     }).join('');
+
+    historyList.innerHTML = html;
 }
 
 // ========================================
 // פונקציה למחיקת רשומה
 // ========================================
 
+function showHistoryOptions(index) {
+    const item = appData.history[index];
+    
+    const choice = confirm(
+        `פרשת ${item.parsha} (${item.date})\n` +
+        `חיזוי: ${item.predicted} | בפועל: ${item.actual}\n` +
+        `שגיאה: ${item.error > 0 ? '+' : ''}${item.error} דקות\n\n` +
+        `לחץ OK לעריכה\n` +
+        `לחץ Cancel למחיקה`
+    );
+
+    if (choice) {
+        editHistoryItem(index);
+    } else {
+        const confirmDelete = confirm(`האם אתה בטוח שברצונך למחוק את הכיוונון?\n\nפרשת ${item.parsha}\n\nהקיזוזים יחושבו מחדש!`);
+        if (confirmDelete) {
+            deleteHistoryItem(index);
+        }
+    }
+}
+
+// ========================================
+// 3. פונקציה להוספת כיוונון ישן
+// ========================================
+
+function showAddCalibrationDialog() {
+    // בחירת פרשה
+    const parshaList = Object.keys(PARSHIOT).join('\n');
+    const parsha = prompt(
+        `הוסף כיוונון ישן\n\n` +
+        `שלב 1/4: בחר פרשה\n\n` +
+        `כתוב את שם הפרשה בדיוק כמו ברשימה:\n\n` +
+        `${parshaList.substring(0, 200)}...`,
+        'ויחי'
+    );
+
+    if (!parsha) return;
+
+    // בדיקה שהפרשה קיימת
+    if (!PARSHIOT[parsha]) {
+        alert('❌ שם פרשה לא תקין!\n\nוודא שכתבת את השם בדיוק כמו ברשימת הפרשות.');
+        return;
+    }
+
+    // תאריך
+    const date = prompt(
+        `שלב 2/4: תאריך\n\nפרשת ${parsha}\n\nהזן תאריך (פורמט: YYYY-MM-DD):`,
+        new Date().toISOString().split('T')[0]
+    );
+
+    if (!date) return;
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        alert('❌ פורמט תאריך לא תקין!\n\nהשתמש ב: YYYY-MM-DD (לדוגמה: 2025-12-27)');
+        return;
+    }
+
+    // חיזוי
+    const predicted = prompt(
+        `שלב 3/4: חיזוי\n\nפרשת ${parsha} (${date})\n\nהזן זמן חיזוי (פורמט: HH:MM):`,
+        '09:30'
+    );
+
+    if (!predicted) return;
+
+    if (!/^\d{2}:\d{2}$/.test(predicted)) {
+        alert('❌ פורמט שעה לא תקין!\n\nהשתמש ב: HH:MM (לדוגמה: 09:47)');
+        return;
+    }
+
+    // בפועל
+    const actual = prompt(
+        `שלב 4/4: זמן בפועל\n\nפרשת ${parsha} (${date})\nחיזוי: ${predicted}\n\nהזן זמן חזרה בפועל (פורמט: HH:MM):`,
+        '09:45'
+    );
+
+    if (!actual) return;
+
+    if (!/^\d{2}:\d{2}$/.test(actual)) {
+        alert('❌ פורמט שעה לא תקין!\n\nהשתמש ב: HH:MM (לדוגמה: 09:47)');
+        return;
+    }
+
+    // חישוב שגיאה
+    const [predHour, predMin] = predicted.split(':').map(Number);
+    const [actHour, actMin] = actual.split(':').map(Number);
+    const error = (actHour * 60 + actMin) - (predHour * 60 + predMin);
+
+    // הוספה להיסטוריה
+    appData.history.push({
+        date: date,
+        parsha: parsha,
+        predicted: predicted,
+        actual: actual,
+        error: error
+    });
+
+    // מיון לפי תאריך
+    appData.history.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // עדכון מספר כיוונונים
+    appData.calibrationCount = appData.history.length;
+
+    // חישוב מחדש של כל הקיזוזים
+    recalculateOffsets();
+
+    // שמירה ועדכון
+    saveData();
+    updateHistory();
+    updateStats();
+    updateLearningDisplay();
+    updatePrediction();
+
+    alert(`✅ כיוונון נוסף בהצלחה!\n\nפרשת ${parsha}\nשגיאה: ${error > 0 ? '+' : ''}${error} דקות\n\nהקיזוזים חושבו מחדש!`);
+}
+        
 function deleteHistoryItem(index) {
     const item = appData.history[index];
     
@@ -737,9 +873,8 @@ function editHistoryItem(index) {
         item.actual
     );
 
-    if (!newTime) return; // ביטול
+    if (!newTime) return;
 
-    // בדיקת פורמט
     if (!/^\d{2}:\d{2}$/.test(newTime)) {
         alert('❌ פורמט לא תקין! השתמש ב: HH:MM (לדוגמה: 09:47)');
         return;
@@ -750,14 +885,14 @@ function editHistoryItem(index) {
     const [actHour, actMin] = newTime.split(':').map(Number);
     const newError = (actHour * 60 + actMin) - (predHour * 60 + predMin);
 
-    // עדכון הרשומה
+    // עדכון
     appData.history[index].actual = newTime;
     appData.history[index].error = newError;
 
-    // חישוב מחדש של כל הקיזוזים
+    // חישוב מחדש
     recalculateOffsets();
 
-    // שמירה ועדכון תצוגה
+    // שמירה ועדכון
     saveData();
     updateHistory();
     updateStats();
