@@ -360,6 +360,113 @@
             font-size: 0.9em;
             margin-top: 10px;
         }
+
+    .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-input-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .modal-input-group select,
+        .modal-input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .modal-input-group select:focus,
+        .modal-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-input-group .readonly-field {
+            background: #f5f5f5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.98);
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .info-text {
+            font-size: 0.9em;
+            color: #999;
+            margin-top: 5px;
+        }
+        
     </style>
 </head>
 <body>
@@ -746,70 +853,150 @@ function showHistoryOptions(index) {
 // 3. פונקציה להוספת כיוונון ישן
 // ========================================
 
+// תאריכי שבתות לכל פרשה (2024-2025)
+const PARSHA_DATES = {
+    "בראשית": "2024-11-01",
+    "נח": "2024-11-08",
+    "לך לך": "2024-11-15",
+    "וירא": "2024-11-09",
+    "חיי שרה": "2024-11-15",
+    "תולדות": "2024-11-22",
+    "ויצא": "2024-11-29",
+    "וישלח": "2024-12-06",
+    "וישב": "2024-12-13",
+    "מקץ": "2024-12-20",
+    "ויגש": "2024-12-27",
+    "ויחי": "2025-01-03",
+    "שמות": "2025-01-10",
+    "וארא": "2025-01-17",
+    "בא": "2025-01-24",
+    "בשלח": "2025-01-31",
+    "יתרו": "2025-02-07",
+    "משפטים": "2025-02-14",
+    "תרומה": "2025-02-21",
+    "תצוה": "2025-02-28",
+    "כי תשא": "2025-03-07",
+    "ויקהל": "2025-03-14",
+    "פקודי": "2025-03-21",
+    "ויקהל-פקודי": "2025-03-14",
+    "ויקרא": "2025-03-28",
+    "צו": "2025-04-04",
+    "שמיני": "2025-04-11",
+    "תזריע": "2025-04-18",
+    "מצורע": "2025-04-25",
+    "תזריע-מצורע": "2025-04-18",
+    "אחרי מות": "2025-05-02",
+    "קדושים": "2025-05-09",
+    "אחרי מות-קדושים": "2025-05-02",
+    "אמור": "2025-05-16",
+    "בהר": "2025-05-23",
+    "בחוקתי": "2025-05-30",
+    "בהר-בחוקתי": "2025-05-23",
+    "במדבר": "2025-06-06",
+    "נשא": "2025-06-13",
+    "בהעלותך": "2025-06-20",
+    "שלח": "2025-06-27",
+    "קרח": "2025-07-04",
+    "חקת": "2025-07-11",
+    "בלק": "2025-07-18",
+    "חקת-בלק": "2025-07-11",
+    "פינחס": "2025-07-25",
+    "מטות": "2025-08-01",
+    "מסעי": "2025-08-08",
+    "מטות-מסעי": "2025-08-01",
+    "דברים": "2025-08-15",
+    "ואתחנן": "2025-08-22",
+    "עקב": "2025-08-29",
+    "ראה": "2025-09-05",
+    "שופטים": "2025-09-12",
+    "כי תצא": "2025-09-19",
+    "כי תבוא": "2025-09-26",
+    "נצבים": "2025-10-03",
+    "וילך": "2025-10-10",
+    "נצבים-וילך": "2025-10-03",
+    "האזינו": "2025-10-17",
+    "וזאת הברכה": "2025-10-24"
+};
+
 function showAddCalibrationDialog() {
-    // בחירת פרשה
-    const parshaList = Object.keys(PARSHIOT).join('\n');
-    const parsha = prompt(
-        `הוסף כיוונון ישן\n\n` +
-        `שלב 1/4: בחר פרשה\n\n` +
-        `כתוב את שם הפרשה בדיוק כמו ברשימה:\n\n` +
-        `${parshaList.substring(0, 200)}...`,
-        'ויחי'
-    );
+    const select = document.getElementById('modalParsha');
+    select.innerHTML = '<option value="">בחר פרשה...</option>';
+    
+    Object.keys(PARSHIOT).forEach(parsha => {
+        const option = document.createElement('option');
+        option.value = parsha;
+        option.textContent = parsha;
+        select.appendChild(option);
+    });
 
-    if (!parsha) return;
+    document.getElementById('modalDate').value = '';
+    document.getElementById('modalPredicted').value = '';
+    document.getElementById('modalActual').value = '';
 
-    // בדיקה שהפרשה קיימת
-    if (!PARSHIOT[parsha]) {
-        alert('❌ שם פרשה לא תקין!\n\nוודא שכתבת את השם בדיוק כמו ברשימת הפרשות.');
+    document.getElementById('addCalibrationModal').classList.add('active');
+}
+
+function closeAddCalibrationModal() {
+    document.getElementById('addCalibrationModal').classList.remove('active');
+}
+
+function updateModalFields() {
+    const parsha = document.getElementById('modalParsha').value;
+    
+    if (!parsha) {
+        document.getElementById('modalDate').value = '';
+        document.getElementById('modalPredicted').value = '';
         return;
     }
 
-    // תאריך
-    const date = prompt(
-        `שלב 2/4: תאריך\n\nפרשת ${parsha}\n\nהזן תאריך (פורמט: YYYY-MM-DD):`,
-        new Date().toISOString().split('T')[0]
-    );
+    const date = PARSHA_DATES[parsha] || new Date().toISOString().split('T')[0];
+    document.getElementById('modalDate').value = date;
 
-    if (!date) return;
+    const verses = PARSHIOT[parsha];
+    if (!verses) return;
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        alert('❌ פורמט תאריך לא תקין!\n\nהשתמש ב: YYYY-MM-DD (לדוגמה: 2025-12-27)');
+    const category = getCategory(verses);
+    const categoryOffset = appData.categoryOffsets[category] || 0;
+    
+    const totalMinutes = (verses * appData.baseMinutesPerVerse) + 
+                        appData.globalOffset + categoryOffset;
+    
+    const [startHour, startMin] = appData.startTime.split(':').map(Number);
+    const startTotalMin = startHour * 60 + startMin;
+    const endTotalMin = startTotalMin + Math.round(totalMinutes);
+    
+    const endHour = Math.floor(endTotalMin / 60);
+    const endMin = endTotalMin % 60;
+    
+    const predictedTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+    document.getElementById('modalPredicted').value = predictedTime;
+}
+
+function saveManualCalibration() {
+    const parsha = document.getElementById('modalParsha').value;
+    const date = document.getElementById('modalDate').value;
+    const predicted = document.getElementById('modalPredicted').value;
+    const actual = document.getElementById('modalActual').value;
+
+    if (!parsha) {
+        alert('❌ נא לבחור פרשה');
         return;
     }
 
-    // חיזוי
-    const predicted = prompt(
-        `שלב 3/4: חיזוי\n\nפרשת ${parsha} (${date})\n\nהזן זמן חיזוי (פורמט: HH:MM):`,
-        '09:30'
-    );
-
-    if (!predicted) return;
-
-    if (!/^\d{2}:\d{2}$/.test(predicted)) {
-        alert('❌ פורמט שעה לא תקין!\n\nהשתמש ב: HH:MM (לדוגמה: 09:47)');
+    if (!actual) {
+        alert('❌ נא להזין זמן חזרה בפועל');
         return;
     }
-
-    // בפועל
-    const actual = prompt(
-        `שלב 4/4: זמן בפועל\n\nפרשת ${parsha} (${date})\nחיזוי: ${predicted}\n\nהזן זמן חזרה בפועל (פורמט: HH:MM):`,
-        '09:45'
-    );
-
-    if (!actual) return;
 
     if (!/^\d{2}:\d{2}$/.test(actual)) {
         alert('❌ פורמט שעה לא תקין!\n\nהשתמש ב: HH:MM (לדוגמה: 09:47)');
         return;
     }
 
-    // חישוב שגיאה
     const [predHour, predMin] = predicted.split(':').map(Number);
     const [actHour, actMin] = actual.split(':').map(Number);
     const error = (actHour * 60 + actMin) - (predHour * 60 + predMin);
 
-    // הוספה להיסטוריה
     appData.history.push({
         date: date,
         parsha: parsha,
@@ -818,24 +1005,29 @@ function showAddCalibrationDialog() {
         error: error
     });
 
-    // מיון לפי תאריך
     appData.history.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // עדכון מספר כיוונונים
     appData.calibrationCount = appData.history.length;
 
-    // חישוב מחדש של כל הקיזוזים
     recalculateOffsets();
 
-    // שמירה ועדכון
     saveData();
     updateHistory();
     updateStats();
     updateLearningDisplay();
     updatePrediction();
 
+    closeAddCalibrationModal();
+
     alert(`✅ כיוונון נוסף בהצלחה!\n\nפרשת ${parsha}\nשגיאה: ${error > 0 ? '+' : ''}${error} דקות\n\nהקיזוזים חושבו מחדש!`);
 }
+
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('addCalibrationModal');
+    if (e.target === modal) {
+        closeAddCalibrationModal();
+    }
+});
         
 function deleteHistoryItem(index) {
     const item = appData.history[index];
@@ -1029,5 +1221,47 @@ function recalculateOffsets() {
         window.addEventListener('DOMContentLoaded', init);
         
     </script>
+
+<div class="modal-overlay" id="addCalibrationModal">
+        <div class="modal-content">
+            <div class="modal-header">➕ הוסף כיוונון ישן</div>
+            
+            <div class="modal-input-group">
+                <label for="modalParsha">פרשת השבוע</label>
+                <select id="modalParsha" onchange="updateModalFields()">
+                    <option value="">בחר פרשה...</option>
+                </select>
+                <div class="info-text">בחר את הפרשה שברצונך לכייל</div>
+            </div>
+
+            <div class="modal-input-group">
+                <label for="modalDate">תאריך השבת</label>
+                <input type="date" id="modalDate" class="readonly-field" readonly>
+                <div class="info-text">התאריך מתמלא אוטומטית</div>
+            </div>
+
+            <div class="modal-input-group">
+                <label for="modalPredicted">חיזוי (זמן משוער)</label>
+                <input type="time" id="modalPredicted" class="readonly-field" readonly>
+                <div class="info-text">החיזוי מחושב אוטומטית לפי המערכת</div>
+            </div>
+
+            <div class="modal-input-group">
+                <label for="modalActual">זמן חזרה בפועל *</label>
+                <input type="time" id="modalActual" placeholder="09:47" required>
+                <div class="info-text">הזן את הזמן שבו בפועל חזרת מבית הכנסת</div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closeAddCalibrationModal()">
+                    ❌ ביטול
+                </button>
+                <button class="modal-btn modal-btn-primary" onclick="saveManualCalibration()">
+                    💾 שמור
+                </button>
+            </div>
+        </div>
+    </div>
+    
 </body>
 </html>
