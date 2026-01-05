@@ -31,10 +31,20 @@
         .home-status h4 { color: #333; margin-bottom: 8px; }
         .home-status p { color: #666; font-size: 0.95em; }
         .card { background: white; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .prediction-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; }
+        .parsha-name { font-size: 2em; font-weight: bold; margin-bottom: 10px; }
+        .verses-count { opacity: 0.9; margin-bottom: 20px; }
+        .time-display { font-size: 3em; font-weight: bold; margin: 20px 0; }
+        .duration { opacity: 0.9; font-size: 1.1em; }
+        .confidence { display: inline-block; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; margin-top: 15px; font-size: 0.9em; }
         .section-title { font-size: 1.5em; margin-bottom: 20px; color: #667eea; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
         .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
         .btn-secondary { background: #f5f5f5; color: #333; margin-top: 10px; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #555; font-weight: 500; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: #667eea; }
         .member-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; }
         .member-info { display: flex; align-items: center; gap: 12px; }
         .member-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #667eea; }
@@ -43,19 +53,31 @@
         .member-role { background: #667eea; color: white; padding: 5px 12px; border-radius: 15px; font-size: 0.85em; }
         .member-role.admin { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .remove-member-btn { background: #ffebee; color: #d32f2f; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .history-item { padding: 15px; border-right: 4px solid #667eea; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; cursor: pointer; }
+        .history-item:hover { background: #f0f0f0; }
+        .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .history-parsha { font-weight: bold; color: #667eea; }
+        .history-date { color: #999; font-size: 0.9em; }
+        .history-times { color: #666; font-size: 0.9em; }
+        .history-calibrator { color: #999; font-size: 0.85em; margin-top: 5px; }
+        .error-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.85em; font-weight: bold; margin-right: 10px; }
+        .error-positive { background: #ffe0e0; color: #d32f2f; }
+        .error-negative { background: #e0f2f1; color: #00897b; }
+        .error-zero { background: #e8f5e9; color: #43a047; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .modal-header { font-size: 1.8em; font-weight: bold; color: #667eea; margin-bottom: 25px; text-align: center; }
         .modal-input-group { margin-bottom: 20px; }
         .modal-input-group label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
-        .modal-input-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; }
-        .modal-input-group input:focus { outline: none; border-color: #667eea; }
+        .modal-input-group input, .modal-input-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; }
+        .modal-input-group input:focus, .modal-input-group select:focus { outline: none; border-color: #667eea; }
         .modal-buttons { display: flex; gap: 10px; margin-top: 25px; }
         .modal-btn { flex: 1; padding: 15px; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
         .modal-btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
         .modal-btn-secondary { background: #f5f5f5; color: #333; }
         .info-text { font-size: 0.9em; color: #999; margin-top: 5px; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
         .hidden { display: none !important; }
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab { flex: 1; padding: 12px; background: #f5f5f5; border: none; border-radius: 10px; cursor: pointer; font-weight: 500; }
@@ -97,9 +119,18 @@
             </div>
             <div class="home-status" id="homeStatus"><h4>⏳ טוען מצב...</h4></div>
         </div>
+        <div class="card prediction-card" id="predictionCard" style="display:none;">
+            <div class="parsha-name" id="currentParsha">טוען...</div>
+            <div class="verses-count" id="versesCount">- פסוקים</div>
+            <div class="time-display" id="predictedTime">--:--</div>
+            <div class="duration" id="duration">משך משוער: -- דקות</div>
+            <div class="confidence" id="confidence">רמת ביטחון: נמוכה</div>
+        </div>
         <div class="card">
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('home')">בית</button>
+                <button class="tab" onclick="switchTab('calibrate')">כיוונון</button>
+                <button class="tab" onclick="switchTab('history')">היסטוריה</button>
                 <button class="tab" onclick="switchTab('settings')">הגדרות</button>
             </div>
             <div id="homeTab">
@@ -123,9 +154,31 @@
                     <button class="btn btn-secondary" onclick="leaveHome()">🚪 עזוב בית משפחתי</button>
                 </div>
             </div>
+            <div id="calibrateTab" class="hidden">
+                <div class="section-title">🔧 כיוונון זמן חזרה</div>
+                <div class="input-group">
+                    <label for="parshaSelect">פרשת השבוע</label>
+                    <select id="parshaSelect">
+                        <option value="">בחר פרשה...</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="actualTime">מתי בפועל חזרת?</label>
+                    <input type="time" id="actualTime">
+                </div>
+                <button class="btn btn-primary" onclick="saveCalibration()">💾 שמור כיוונון</button>
+            </div>
+            <div id="historyTab" class="hidden">
+                <div class="section-title">📊 היסטוריית כיוונונים</div>
+                <div id="historyList"></div>
+            </div>
             <div id="settingsTab" class="hidden">
                 <div class="section-title">⚙️ הגדרות</div>
-                <p style="color: #666;">בקרוב: הגדרות אישיות, התראות, ועוד...</p>
+                <div class="input-group">
+                    <label for="startTime">שעת התחלת תפילה</label>
+                    <input type="time" id="startTime" value="08:00">
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()">💾 שמור הגדרות</button>
             </div>
         </div>
     </div>
@@ -177,6 +230,8 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        const PARSHIOT = {"בראשית":146,"נח":153,"לך לך":126,"וירא":147,"חיי שרה":105,"תולדות":106,"ויצא":148,"וישלח":153,"וישב":112,"מקץ":146,"ויגש":106,"ויחי":85,"שמות":124,"וארא":121,"בא":105,"בשלח":116,"יתרו":72,"משפטים":118,"תרומה":96,"תצוה":101,"כי תשא":139,"ויקהל":122,"פקודי":92,"ויקהל-פקודי":214,"ויקרא":111,"צו":97,"שמיני":91,"תזריע":67,"מצורע":90,"תזריע-מצורע":157,"אחרי מות":80,"קדושים":64,"אחרי מות-קדושים":144,"אמור":124,"בהר":57,"בחוקתי":78,"בהר-בחוקתי":135,"במדבר":159,"נשא":176,"בהעלותך":136,"שלח":119,"קרח":95,"חקת":87,"בלק":104,"חקת-בלק":191,"פינחס":168,"מטות":112,"מסעי":132,"מטות-מסעי":244,"דברים":105,"ואתחנן":122,"עקב":111,"ראה":126,"שופטים":97,"כי תצא":110,"כי תבוא":122,"נצבים":40,"וילך":30,"נצבים-וילך":70,"האזינו":52,"וזאת הברכה":41};
+
         let currentUser = null;
         let userHome = null;
         let homeData = null;
@@ -207,6 +262,7 @@
                 document.getElementById('appScreen').style.display = 'block';
                 await initUserData();
                 await loadUserHome();
+                loadParshaSelect();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('appScreen').style.display = 'none';
@@ -248,6 +304,9 @@
                 if (homeSnap.exists()) {
                     homeData = homeSnap.data();
                     await showHasHome();
+                    updatePrediction();
+                    loadHistory();
+                    loadSettings();
                 } else {
                     showNoHome();
                 }
@@ -259,6 +318,7 @@
             document.getElementById('homeStatus').innerHTML = '<h4>🏠 אין בית משפחתי</h4><p>צור בית חדש או המתן להזמנה</p>';
             document.getElementById('noHomeView').classList.remove('hidden');
             document.getElementById('hasHomeView').classList.add('hidden');
+            document.getElementById('predictionCard').style.display = 'none';
         }
 
         async function showHasHome() {
@@ -266,8 +326,10 @@
             document.getElementById('homeStatus').innerHTML = `<h4>✅ מחובר לבית משפחתי</h4><p>${homeData.name}</p>`;
             document.getElementById('noHomeView').classList.add('hidden');
             document.getElementById('hasHomeView').classList.remove('hidden');
+            document.getElementById('predictionCard').style.display = 'block';
             document.getElementById('homeName').textContent = homeData.name;
-            document.getElementById('homeStats').textContent = `${homeData.members.length} חברים`;
+            const historyCount = homeData.history ? homeData.history.length : 0;
+            document.getElementById('homeStats').textContent = `${homeData.members.length} חברים | ${historyCount} כיוונונים`;
             await loadMembers();
             if (homeData.adminId === currentUser.uid) {
                 document.getElementById('adminActions').classList.remove('hidden');
@@ -305,16 +367,201 @@
             }
         }
 
+        function loadParshaSelect() {
+            const select = document.getElementById('parshaSelect');
+            select.innerHTML = '<option value="">בחר פרשה...</option>';
+            for (const parsha in PARSHIOT) {
+                const option = document.createElement('option');
+                option.value = parsha;
+                option.textContent = parsha;
+                select.appendChild(option);
+            }
+        }
+
+        function getCategory(verses) {
+            if (verses < 80) return 'short';
+            if (verses < 140) return 'medium';
+            if (verses < 180) return 'long';
+            return 'very_long';
+        }
+
+        function calculatePrediction(parsha) {
+            if (!homeData) return null;
+            const verses = PARSHIOT[parsha];
+            if (!verses) return null;
+            
+            const baseMinutesPerVerse = homeData.baseMinutesPerVerse || 0.918;
+            const globalOffset = homeData.globalOffset || 0;
+            const categoryOffsets = homeData.categoryOffsets || {short:0, medium:0, long:0, very_long:0};
+            const startTime = homeData.startTime || "08:00";
+            
+            const category = getCategory(verses);
+            const categoryOffset = categoryOffsets[category] || 0;
+            const totalMinutes = (verses * baseMinutesPerVerse) + globalOffset + categoryOffset;
+            
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const startTotalMin = startHour * 60 + startMin;
+            const endTotalMin = startTotalMin + Math.round(totalMinutes);
+            const endHour = Math.floor(endTotalMin / 60);
+            const endMin = endTotalMin % 60;
+            
+            return {
+                time: `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`,
+                duration: Math.round(totalMinutes),
+                verses: verses,
+                category: category
+            };
+        }
+
+        function updatePrediction() {
+            if (!homeData) return;
+            const parshaSelect = document.getElementById('parshaSelect');
+            const selectedParsha = parshaSelect.value;
+            
+            if (!selectedParsha) {
+                document.getElementById('currentParsha').textContent = 'בחר פרשה';
+                document.getElementById('versesCount').textContent = '';
+                document.getElementById('predictedTime').textContent = '--:--';
+                document.getElementById('duration').textContent = '';
+                document.getElementById('confidence').textContent = '';
+                return;
+            }
+            
+            const prediction = calculatePrediction(selectedParsha);
+            if (prediction) {
+                document.getElementById('currentParsha').textContent = `פרשת ${selectedParsha}`;
+                document.getElementById('versesCount').textContent = `${prediction.verses} פסוקים`;
+                document.getElementById('predictedTime').textContent = prediction.time;
+                document.getElementById('duration').textContent = `משך משוער: ${prediction.duration} דקות`;
+                
+                const historyCount = homeData.history ? homeData.history.length : 0;
+                let confidence = 'נמוכה';
+                if (historyCount >= 10) confidence = 'גבוהה 🎯';
+                else if (historyCount >= 5) confidence = 'בינונית 📈';
+                document.getElementById('confidence').textContent = `רמת ביטחון: ${confidence}`;
+            }
+        }
+
+        document.getElementById('parshaSelect').addEventListener('change', updatePrediction);
+
+        window.saveCalibration = async function() {
+            if (!homeData) { alert('אין בית משפחתי'); return; }
+            
+            const parsha = document.getElementById('parshaSelect').value;
+            const actualTime = document.getElementById('actualTime').value;
+            
+            if (!parsha) { alert('נא לבחור פרשה'); return; }
+            if (!actualTime) { alert('נא להזין זמן חזרה'); return; }
+            
+            const prediction = calculatePrediction(parsha);
+            if (!prediction) return;
+            
+            const [predHour, predMin] = prediction.time.split(':').map(Number);
+            const [actHour, actMin] = actualTime.split(':').map(Number);
+            const errorMinutes = (actHour * 60 + actMin) - (predHour * 60 + predMin);
+            
+            const newCalibration = {
+                date: new Date().toISOString().split('T')[0],
+                parsha: parsha,
+                predicted: prediction.time,
+                actual: actualTime,
+                error: errorMinutes,
+                calibratorId: currentUser.uid,
+                calibratorName: currentUser.displayName
+            };
+            
+            const GLOBAL_RATE = 0.3;
+            const CATEGORY_RATE = 0.2;
+            
+            const newGlobalOffset = (homeData.globalOffset || 0) + (errorMinutes * GLOBAL_RATE);
+            const categoryOffsets = homeData.categoryOffsets || {short:0, medium:0, long:0, very_long:0};
+            categoryOffsets[prediction.category] += errorMinutes * CATEGORY_RATE;
+            
+            const history = homeData.history || [];
+            history.unshift(newCalibration);
+            if (history.length > 52) history.splice(52);
+            
+            try {
+                await updateDoc(doc(db, 'homes', userHome), {
+                    history: history,
+                    globalOffset: newGlobalOffset,
+                    categoryOffsets: categoryOffsets,
+                    baseMinutesPerVerse: homeData.baseMinutesPerVerse || 0.918
+                });
+                
+                alert(`✅ כיוונון נשמר!\n\nשגיאה: ${errorMinutes > 0 ? '+' : ''}${errorMinutes} דקות`);
+                document.getElementById('parshaSelect').value = '';
+                document.getElementById('actualTime').value = '';
+                updatePrediction();
+            } catch (error) {
+                alert('שגיאה: ' + error.message);
+            }
+        };
+
+        function loadHistory() {
+            const historyList = document.getElementById('historyList');
+            if (!homeData || !homeData.history || homeData.history.length === 0) {
+                historyList.innerHTML = '<div class="empty-state"><p>אין עדיין היסטוריה</p><p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל כדי לראות נתונים כאן</p></div>';
+                return;
+            }
+            
+            historyList.innerHTML = homeData.history.map(item => {
+                let errorClass = 'error-zero';
+                if (item.error > 0) errorClass = 'error-positive';
+                else if (item.error < 0) errorClass = 'error-negative';
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-item-header">
+                            <span class="history-parsha">${item.parsha}</span>
+                            <span class="history-date">${item.date}</span>
+                        </div>
+                        <div class="history-times">
+                            חיזוי: ${item.predicted} | בפועל: ${item.actual}
+                            <span class="error-badge ${errorClass}">${item.error > 0 ? '+' : ''}${item.error} דק'</span>
+                        </div>
+                        <div class="history-calibrator">כויל ע"י: ${item.calibratorName || 'לא ידוע'}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function loadSettings() {
+            if (homeData && homeData.startTime) {
+                document.getElementById('startTime').value = homeData.startTime;
+            }
+        }
+
+        window.saveSettings = async function() {
+            const startTime = document.getElementById('startTime').value;
+            
+            if (homeData.adminId !== currentUser.uid) {
+                alert('רק המנהל יכול לשנות הגדרות הבית');
+                return;
+            }
+            
+            try {
+                await updateDoc(doc(db, 'homes', userHome), {
+                    startTime: startTime
+                });
+                alert('✅ הגדרות נשמרו!');
+                updatePrediction();
+            } catch (error) {
+                alert('שגיאה: ' + error.message);
+            }
+        };
+
         window.switchTab = function(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById('homeTab').classList.add('hidden');
+            document.getElementById('calibrateTab').classList.add('hidden');
+            document.getElementById('historyTab').classList.add('hidden');
             document.getElementById('settingsTab').classList.add('hidden');
-            if (tab === 'home') {
-                document.getElementById('homeTab').classList.remove('hidden');
-            } else if (tab === 'settings') {
-                document.getElementById('settingsTab').classList.remove('hidden');
-            }
+            if (tab === 'home') document.getElementById('homeTab').classList.remove('hidden');
+            else if (tab === 'calibrate') document.getElementById('calibrateTab').classList.remove('hidden');
+            else if (tab === 'history') document.getElementById('historyTab').classList.remove('hidden');
+            else if (tab === 'settings') document.getElementById('settingsTab').classList.remove('hidden');
         };
 
         window.showCreateHomeModal = () => {
@@ -337,7 +584,11 @@
                     adminId: currentUser.uid,
                     members: [currentUser.uid],
                     createdAt: new Date().toISOString(),
-                    history: []
+                    history: [],
+                    baseMinutesPerVerse: 0.918,
+                    globalOffset: 0,
+                    categoryOffsets: {short:0, medium:0, long:0, very_long:0},
+                    startTime: "08:00"
                 });
                 await updateDoc(doc(db, 'users', currentUser.uid), { homeId: homeId });
                 window.closeCreateHomeModal();
@@ -407,3 +658,4 @@
 
     </body>
 </html>
+
