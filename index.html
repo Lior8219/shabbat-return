@@ -4,216 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🕍 שעת חזרה משחרית של שבת</title>
-    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            direction: rtl;
-        }
-
-        /* מסך התחברות */
-        .login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-
-        .login-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
-        }
-
-        .login-title {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .login-subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        .google-login-btn {
-            width: 100%;
-            padding: 15px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .google-login-btn:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-
-        .google-icon {
-            width: 24px;
-            height: 24px;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* מסך האפליקציה */
-        .app-screen {
-            display: none;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .app-header {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 3px solid #667eea;
-        }
-
-        .user-details h3 {
-            color: #333;
-            font-size: 1.1em;
-            margin-bottom: 3px;
-        }
-
-        .user-details p {
-            color: #999;
-            font-size: 0.9em;
-        }
-
-        .logout-btn {
-            background: #f5f5f5;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: #e0e0e0;
-        }
-
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-
-        .section-title {
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            color: #667eea;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-box {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-
-        .info-box h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .info-box p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; direction: rtl; padding: 20px; }
+        .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .login-card { background: white; border-radius: 20px; padding: 40px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center; }
+        .login-icon { font-size: 4em; margin-bottom: 20px; }
+        .login-title { font-size: 1.8em; font-weight: bold; color: #667eea; margin-bottom: 10px; }
+        .login-subtitle { color: #666; margin-bottom: 30px; line-height: 1.5; }
+        .google-login-btn { width: 100%; padding: 15px; background: white; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1.1em; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .google-login-btn:hover { border-color: #667eea; background: #f8f9ff; }
+        .loading { display: none; text-align: center; padding: 20px; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .app-screen { display: none; max-width: 600px; margin: 0 auto; }
+        .app-header { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .user-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 50px; height: 50px; border-radius: 50%; border: 3px solid #667eea; }
+        .user-details h3 { color: #333; font-size: 1.1em; margin-bottom: 3px; }
+        .user-details p { color: #999; font-size: 0.9em; }
+        .logout-btn { background: #f5f5f5; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .home-status { background: #f9f9f9; padding: 15px; border-radius: 10px; }
+        .home-status.has-home { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); }
+        .home-status.no-home { background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); }
+        .home-status h4 { color: #333; margin-bottom: 8px; }
+        .home-status p { color: #666; font-size: 0.95em; }
+        .card { background: white; border-radius: 20px; padding: 30px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .section-title { font-size: 1.5em; margin-bottom: 20px; color: #667eea; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-secondary { background: #f5f5f5; color: #333; margin-top: 10px; }
+        .member-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; }
+        .member-info { display: flex; align-items: center; gap: 12px; }
+        .member-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #667eea; }
+        .member-details h4 { color: #333; font-size: 1em; }
+        .member-details p { color: #999; font-size: 0.85em; }
+        .member-role { background: #667eea; color: white; padding: 5px 12px; border-radius: 15px; font-size: 0.85em; }
+        .member-role.admin { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .remove-member-btn { background: #ffebee; color: #d32f2f; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-header { font-size: 1.8em; font-weight: bold; color: #667eea; margin-bottom: 25px; text-align: center; }
+        .modal-input-group { margin-bottom: 20px; }
+        .modal-input-group label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
+        .modal-input-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; }
+        .modal-input-group input:focus { outline: none; border-color: #667eea; }
+        .modal-buttons { display: flex; gap: 10px; margin-top: 25px; }
+        .modal-btn { flex: 1; padding: 15px; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
+        .modal-btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .modal-btn-secondary { background: #f5f5f5; color: #333; }
+        .info-text { font-size: 0.9em; color: #999; margin-top: 5px; }
+        .hidden { display: none !important; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 12px; background: #f5f5f5; border: none; border-radius: 10px; cursor: pointer; font-weight: 500; }
+        .tab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
     </style>
 </head>
 <body>
-    <!-- מסך התחברות -->
     <div class="login-screen" id="loginScreen">
         <div class="login-card">
             <div class="login-icon">🕍</div>
             <h1 class="login-title">שעת חזרה משחרית של שבת</h1>
-            <p class="login-subtitle">
-                מערכת חכמה עם למידת מכונה<br>
-                גיבוי אוטומטי ☁️ | סנכרון בין מכשירים 🔄
-            </p>
-            
+            <p class="login-subtitle">מערכת חכמה עם למידת מכונה<br>גיבוי אוטומטי ☁️ | סנכרון בין מכשירים 🔄</p>
             <button class="google-login-btn" id="googleLoginBtn">
-                <svg class="google-icon" viewBox="0 0 24 24">
+                <svg width="24" height="24" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -221,52 +77,92 @@
                 </svg>
                 התחבר עם Google
             </button>
-
             <div class="loading" id="loginLoading">
                 <div class="spinner"></div>
                 <p>מתחבר...</p>
             </div>
         </div>
     </div>
-
-    <!-- מסך האפליקציה -->
     <div class="app-screen" id="appScreen">
         <div class="app-header">
-            <div class="user-info">
-                <img id="userAvatar" class="user-avatar" src="" alt="User">
-                <div class="user-details">
-                    <h3 id="userName">טוען...</h3>
-                    <p id="userEmail">טוען...</p>
+            <div class="user-section">
+                <div class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User">
+                    <div class="user-details">
+                        <h3 id="userName">טוען...</h3>
+                        <p id="userEmail">טוען...</p>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">התנתק</button>
+            </div>
+            <div class="home-status" id="homeStatus"><h4>⏳ טוען מצב...</h4></div>
+        </div>
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('home')">בית</button>
+                <button class="tab" onclick="switchTab('settings')">הגדרות</button>
+            </div>
+            <div id="homeTab">
+                <div class="section-title">🏠 בית משפחתי</div>
+                <div id="noHomeView">
+                    <p style="color: #666; margin-bottom: 20px;">עדיין אין לך בית משפחתי. צור בית חדש או המתן להזמנה.</p>
+                    <button class="btn btn-primary" onclick="showCreateHomeModal()">➕ צור בית משפחתי חדש</button>
+                </div>
+                <div id="hasHomeView" class="hidden">
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <h4 style="color: #667eea; margin-bottom: 10px;">🏠 <span id="homeName">בית משפחה</span></h4>
+                        <p style="color: #666; font-size: 0.95em;"><span id="homeStats">טוען...</span></p>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 15px;">👥 חברי הבית:</h4>
+                        <div id="membersList"></div>
+                    </div>
+                    <div id="adminActions" class="hidden">
+                        <button class="btn btn-primary" onclick="showInviteMemberModal()">➕ הוסף בן משפחה</button>
+                    </div>
+                    <button class="btn btn-secondary" onclick="leaveHome()">🚪 עזוב בית משפחתי</button>
                 </div>
             </div>
-            <button class="logout-btn" id="logoutBtn">התנתק</button>
+            <div id="settingsTab" class="hidden">
+                <div class="section-title">⚙️ הגדרות</div>
+                <p style="color: #666;">בקרוב: הגדרות אישיות, התראות, ועוד...</p>
+            </div>
         </div>
-
-        <div class="card">
-            <div class="section-title">🎉 ברוך הבא!</div>
-            <div class="info-box">
-                <h4>✅ התחברת בהצלחה!</h4>
-                <p>
-                    המערכת מוכנה לשימוש.<br>
-                    הנתונים שלך מגובים אוטומטית לענן.<br><br>
-                    
-                    <strong>בשלב הבא אני מוסיף:</strong><br>
-                    • מבנה "בית משפחתי"<br>
-                    • כל הכיוונונים והפונקציות<br>
-                    • סנכרון בזמן אמת<br>
-                    • התראות
-                </p>
+    </div>
+    <div class="modal-overlay" id="createHomeModal">
+        <div class="modal-content">
+            <div class="modal-header">➕ צור בית משפחתי חדש</div>
+            <div class="modal-input-group">
+                <label for="homeNameInput">שם הבית</label>
+                <input type="text" id="homeNameInput" placeholder='לדוגמה: "בית משפחת כהן"'>
+                <div class="info-text">הכנס שם לבית המשפחתי</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closeCreateHomeModal()">❌ ביטול</button>
+                <button class="modal-btn modal-btn-primary" onclick="createHome()">💾 צור בית</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="inviteMemberModal">
+        <div class="modal-content">
+            <div class="modal-header">➕ הוסף בן משפחה</div>
+            <div class="modal-input-group">
+                <label for="inviteEmailInput">אימייל</label>
+                <input type="email" id="inviteEmailInput" placeholder="sara@gmail.com">
+                <div class="info-text">הזן את האימייל של בן המשפחה (חייב להיות רשום באפליקציה)</div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" onclick="closeInviteMemberModal()">❌ ביטול</button>
+                <button class="modal-btn modal-btn-primary" onclick="inviteMember()">📧 שלח הזמנה</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAZA1kyjTn4RSUeHwNPzyAknXFUGqaYCB8",
             authDomain: "shabbat-return.firebaseapp.com",
@@ -276,88 +172,238 @@
             appId: "1:173207112920:web:604863391f566717ffdbad"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // Elements
-        const loginScreen = document.getElementById('loginScreen');
-        const appScreen = document.getElementById('appScreen');
-        const googleLoginBtn = document.getElementById('googleLoginBtn');
-        const loginLoading = document.getElementById('loginLoading');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const userAvatar = document.getElementById('userAvatar');
-        const userName = document.getElementById('userName');
-        const userEmail = document.getElementById('userEmail');
+        let currentUser = null;
+        let userHome = null;
+        let homeData = null;
 
-        // Login with Google
-        googleLoginBtn.addEventListener('click', async () => {
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
             try {
-                googleLoginBtn.style.display = 'none';
-                loginLoading.style.display = 'block';
-
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-
-                console.log('✅ התחברות הצליחה:', user.displayName);
-                
+                document.getElementById('googleLoginBtn').style.display = 'none';
+                document.getElementById('loginLoading').style.display = 'block';
+                await signInWithPopup(auth, provider);
             } catch (error) {
-                console.error('❌ שגיאת התחברות:', error);
-                alert('שגיאה בהתחברות: ' + error.message);
-                
-                googleLoginBtn.style.display = 'flex';
-                loginLoading.style.display = 'none';
+                alert('שגיאה: ' + error.message);
+                document.getElementById('googleLoginBtn').style.display = 'flex';
+                document.getElementById('loginLoading').style.display = 'none';
             }
         });
 
-        // Logout
-        logoutBtn.addEventListener('click', async () => {
-            if (confirm('האם להתנתק?')) {
-                try {
-                    await signOut(auth);
-                    console.log('✅ התנתקות הצליחה');
-                } catch (error) {
-                    console.error('❌ שגיאת התנתקות:', error);
-                    alert('שגיאה בהתנתקות: ' + error.message);
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            if (confirm('האם להתנתק?')) await signOut(auth);
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userAvatar').src = user.photoURL || '';
+                document.getElementById('userName').textContent = user.displayName || 'משתמש';
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appScreen').style.display = 'block';
+                await initUserData();
+                await loadUserHome();
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('appScreen').style.display = 'none';
+                document.getElementById('googleLoginBtn').style.display = 'flex';
+                document.getElementById('loginLoading').style.display = 'none';
+            }
+        });
+
+        async function initUserData() {
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    displayName: currentUser.displayName,
+                    photoURL: currentUser.photoURL,
+                    createdAt: new Date().toISOString(),
+                    homeId: null
+                });
+            }
+        }
+
+        async function loadUserHome() {
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.data();
+            if (userData.homeId) {
+                userHome = userData.homeId;
+                await loadHomeData();
+            } else {
+                showNoHome();
+            }
+        }
+
+        async function loadHomeData() {
+            const homeRef = doc(db, 'homes', userHome);
+            onSnapshot(homeRef, async (homeSnap) => {
+                if (homeSnap.exists()) {
+                    homeData = homeSnap.data();
+                    await showHasHome();
+                } else {
+                    showNoHome();
+                }
+            });
+        }
+
+        function showNoHome() {
+            document.getElementById('homeStatus').className = 'home-status no-home';
+            document.getElementById('homeStatus').innerHTML = '<h4>🏠 אין בית משפחתי</h4><p>צור בית חדש או המתן להזמנה</p>';
+            document.getElementById('noHomeView').classList.remove('hidden');
+            document.getElementById('hasHomeView').classList.add('hidden');
+        }
+
+        async function showHasHome() {
+            document.getElementById('homeStatus').className = 'home-status has-home';
+            document.getElementById('homeStatus').innerHTML = `<h4>✅ מחובר לבית משפחתי</h4><p>${homeData.name}</p>`;
+            document.getElementById('noHomeView').classList.add('hidden');
+            document.getElementById('hasHomeView').classList.remove('hidden');
+            document.getElementById('homeName').textContent = homeData.name;
+            document.getElementById('homeStats').textContent = `${homeData.members.length} חברים`;
+            await loadMembers();
+            if (homeData.adminId === currentUser.uid) {
+                document.getElementById('adminActions').classList.remove('hidden');
+            }
+        }
+
+        async function loadMembers() {
+            const membersList = document.getElementById('membersList');
+            membersList.innerHTML = '';
+            for (const memberId of homeData.members) {
+                const memberRef = doc(db, 'users', memberId);
+                const memberSnap = await getDoc(memberRef);
+                if (memberSnap.exists()) {
+                    const memberData = memberSnap.data();
+                    const isAdmin = memberId === homeData.adminId;
+                    const isCurrentUser = memberId === currentUser.uid;
+                    const canRemove = (homeData.adminId === currentUser.uid) && !isCurrentUser;
+                    const memberItem = document.createElement('div');
+                    memberItem.className = 'member-item';
+                    memberItem.innerHTML = `
+                        <div class="member-info">
+                            <img src="${memberData.photoURL || ''}" class="member-avatar" alt="${memberData.displayName}">
+                            <div class="member-details">
+                                <h4>${memberData.displayName}${isCurrentUser ? ' (אתה)' : ''}</h4>
+                                <p>${memberData.email}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span class="member-role${isAdmin ? ' admin' : ''}">${isAdmin ? 'מנהל' : 'חבר'}</span>
+                            ${canRemove ? `<button class="remove-member-btn" onclick="removeMember('${memberId}', '${memberData.displayName}')">🗑️ הסר</button>` : ''}
+                        </div>
+                    `;
+                    membersList.appendChild(memberItem);
                 }
             }
-        });
+        }
 
-        // Auth State Observer
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is signed in
-                console.log('👤 משתמש מחובר:', user.displayName);
-                
-                // Update UI
-                userAvatar.src = user.photoURL || '🕍';
-                userName.textContent = user.displayName || 'משתמש';
-                userEmail.textContent = user.email;
-
-                // Show app screen
-                loginScreen.classList.add('hidden');
-                appScreen.style.display = 'block';
-
-            } else {
-                // User is signed out
-                console.log('👋 משתמש התנתק');
-                
-                // Show login screen
-                loginScreen.classList.remove('hidden');
-                appScreen.style.display = 'none';
-                googleLoginBtn.style.display = 'flex';
-                loginLoading.style.display = 'none';
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('homeTab').classList.add('hidden');
+            document.getElementById('settingsTab').classList.add('hidden');
+            if (tab === 'home') {
+                document.getElementById('homeTab').classList.remove('hidden');
+            } else if (tab === 'settings') {
+                document.getElementById('settingsTab').classList.remove('hidden');
             }
-        });
+        };
 
-        // Make Firebase accessible globally for next steps
-        window.firebaseApp = app;
-        window.firebaseAuth = auth;
-        window.firebaseDb = db;
-        
-        console.log('🔥 Firebase מאותחל בהצלחה!');
+        window.showCreateHomeModal = () => {
+            document.getElementById('createHomeModal').classList.add('active');
+            document.getElementById('homeNameInput').value = '';
+        };
+
+        window.closeCreateHomeModal = () => {
+            document.getElementById('createHomeModal').classList.remove('active');
+        };
+
+        window.createHome = async () => {
+            const homeName = document.getElementById('homeNameInput').value.trim();
+            if (!homeName) { alert('נא להזין שם לבית'); return; }
+            try {
+                const homeId = 'home_' + Date.now();
+                await setDoc(doc(db, 'homes', homeId), {
+                    id: homeId,
+                    name: homeName,
+                    adminId: currentUser.uid,
+                    members: [currentUser.uid],
+                    createdAt: new Date().toISOString(),
+                    history: []
+                });
+                await updateDoc(doc(db, 'users', currentUser.uid), { homeId: homeId });
+                window.closeCreateHomeModal();
+                alert('✅ הבית נוצר בהצלחה!');
+                await loadUserHome();
+            } catch (error) {
+                alert('שגיאה: ' + error.message);
+            }
+        };
+
+        window.showInviteMemberModal = () => {
+            document.getElementById('inviteMemberModal').classList.add('active');
+            document.getElementById('inviteEmailInput').value = '';
+        };
+
+        window.closeInviteMemberModal = () => {
+            document.getElementById('inviteMemberModal').classList.remove('active');
+        };
+
+        window.inviteMember = async () => {
+            const email = document.getElementById('inviteEmailInput').value.trim();
+            if (!email) { alert('נא להזין אימייל'); return; }
+            try {
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('email', '==', email));
+                const querySnapshot = await getDocs(q);
+                if (querySnapshot.empty) { alert('❌ המשתמש לא נמצא'); return; }
+                const invitedUser = querySnapshot.docs[0];
+                const invitedUserId = invitedUser.id;
+                const invitedUserData = invitedUser.data();
+                if (invitedUserData.homeId) { alert('❌ המשתמש כבר חבר בבית אחר'); return; }
+                if (homeData.members.includes(invitedUserId)) { alert('❌ המשתמש כבר חבר בבית'); return; }
+                await updateDoc(doc(db, 'homes', userHome), { members: arrayUnion(invitedUserId) });
+                await updateDoc(doc(db, 'users', invitedUserId), { homeId: userHome });
+                window.closeInviteMemberModal();
+                alert(`✅ ${invitedUserData.displayName} הצטרף לבית!`);
+            } catch (error) {
+                alert('שגיאה: ' + error.message);
+            }
+        };
+
+        window.removeMember = async (memberId, memberName) => {
+            if (!confirm(`האם להסיר את ${memberName}?`)) return;
+            try {
+                await updateDoc(doc(db, 'homes', userHome), { members: arrayRemove(memberId) });
+                await updateDoc(doc(db, 'users', memberId), { homeId: null });
+                alert(`✅ ${memberName} הוסר`);
+            } catch (error) {
+                alert('שגיאה: ' + error.message);
+            }
+        };
+
+        window.leaveHome = async () => {
+            if (!confirm('האם לעזוב את הבית?')) return;
+            try {
+                await updateDoc(doc(db, 'homes', userHome), { members: arrayRemove(currentUser.uid) });
+                await updateDoc(doc(db, 'users', currentUser.uid), { homeId: null });
+                alert('✅ עזבת את הבית');
+                userHome = null;
+                homeData = null;
+                await loadUserHome();
+            } catch (error) {
+                alert('שגיאה: ' + error.message);
+            }
+        };
     </script>
-</body>
+
+    </body>
 </html>
