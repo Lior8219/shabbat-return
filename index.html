@@ -53,8 +53,7 @@
         .member-role { background: #667eea; color: white; padding: 5px 12px; border-radius: 15px; font-size: 0.85em; }
         .member-role.admin { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .remove-member-btn { background: #ffebee; color: #d32f2f; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .history-item { padding: 15px; border-right: 4px solid #667eea; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; cursor: pointer; }
-        .history-item:hover { background: #f0f0f0; }
+        .history-item { padding: 15px; border-right: 4px solid #667eea; background: #f9f9f9; border-radius: 10px; margin-bottom: 10px; }
         .history-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .history-parsha { font-weight: bold; color: #667eea; }
         .history-date { color: #999; font-size: 0.9em; }
@@ -66,13 +65,10 @@
         .error-zero { background: #e8f5e9; color: #43a047; }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 1000; justify-content: center; align-items: center; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .modal-content { background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .modal-header { font-size: 1.8em; font-weight: bold; color: #667eea; margin-bottom: 25px; text-align: center; }
         .modal-input-group { margin-bottom: 20px; }
         .modal-input-group label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
-        .modal-input-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; }
-        .modal-input-group input:focus { outline: none; border-color: #667eea; }
         .modal-input-group input, .modal-input-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em; }
         .modal-input-group input:focus, .modal-input-group select:focus { outline: none; border-color: #667eea; }
         .modal-buttons { display: flex; gap: 10px; margin-top: 25px; }
@@ -177,7 +173,6 @@
             </div>
             <div id="settingsTab" class="hidden">
                 <div class="section-title">⚙️ הגדרות</div>
-                <p style="color: #666;">בקרוב: הגדרות אישיות, התראות, ועוד...</p>
                 <div class="input-group">
                     <label for="startTime">שעת התחלת תפילה</label>
                     <input type="time" id="startTime" value="08:00">
@@ -214,7 +209,6 @@
             </div>
         </div>
     </div>
-
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
@@ -332,7 +326,6 @@
             document.getElementById('hasHomeView').classList.remove('hidden');
             document.getElementById('predictionCard').style.display = 'block';
             document.getElementById('homeName').textContent = homeData.name;
-            document.getElementById('homeStats').textContent = `${homeData.members.length} חברים`;
             const historyCount = homeData.history ? homeData.history.length : 0;
             document.getElementById('homeStats').textContent = `${homeData.members.length} חברים | ${historyCount} כיוונונים`;
             await loadMembers();
@@ -376,296 +369,4 @@
             const select = document.getElementById('parshaSelect');
             select.innerHTML = '<option value="">בחר פרשה...</option>';
             for (const parsha in PARSHIOT) {
-                const option = document.createElement('option');
-                option.value = parsha;
-                option.textContent = parsha;
-                select.appendChild(option);
-            }
-        }
-
-        function getCategory(verses) {
-            if (verses < 80) return 'short';
-            if (verses < 140) return 'medium';
-            if (verses < 180) return 'long';
-            return 'very_long';
-        }
-
-        function calculatePrediction(parsha) {
-            if (!homeData) return null;
-            const verses = PARSHIOT[parsha];
-            if (!verses) return null;
-            
-            const baseMinutesPerVerse = homeData.baseMinutesPerVerse || 0.918;
-            const globalOffset = homeData.globalOffset || 0;
-            const categoryOffsets = homeData.categoryOffsets || {short:0, medium:0, long:0, very_long:0};
-            const startTime = homeData.startTime || "08:00";
-            
-            const category = getCategory(verses);
-            const categoryOffset = categoryOffsets[category] || 0;
-            const totalMinutes = (verses * baseMinutesPerVerse) + globalOffset + categoryOffset;
-            
-            const [startHour, startMin] = startTime.split(':').map(Number);
-            const startTotalMin = startHour * 60 + startMin;
-            const endTotalMin = startTotalMin + Math.round(totalMinutes);
-            const endHour = Math.floor(endTotalMin / 60);
-            const endMin = endTotalMin % 60;
-            
-            return {
-                time: `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`,
-                duration: Math.round(totalMinutes),
-                verses: verses,
-                category: category
-            };
-        }
-
-        function updatePrediction() {
-            if (!homeData) return;
-            const parshaSelect = document.getElementById('parshaSelect');
-            const selectedParsha = parshaSelect.value;
-            
-            if (!selectedParsha) {
-                document.getElementById('currentParsha').textContent = 'בחר פרשה';
-                document.getElementById('versesCount').textContent = '';
-                document.getElementById('predictedTime').textContent = '--:--';
-                document.getElementById('duration').textContent = '';
-                document.getElementById('confidence').textContent = '';
-                return;
-            }
-            
-            const prediction = calculatePrediction(selectedParsha);
-            if (prediction) {
-                document.getElementById('currentParsha').textContent = `פרשת ${selectedParsha}`;
-                document.getElementById('versesCount').textContent = `${prediction.verses} פסוקים`;
-                document.getElementById('predictedTime').textContent = prediction.time;
-                document.getElementById('duration').textContent = `משך משוער: ${prediction.duration} דקות`;
-                
-                const historyCount = homeData.history ? homeData.history.length : 0;
-                let confidence = 'נמוכה';
-                if (historyCount >= 10) confidence = 'גבוהה 🎯';
-                else if (historyCount >= 5) confidence = 'בינונית 📈';
-                document.getElementById('confidence').textContent = `רמת ביטחון: ${confidence}`;
-            }
-        }
-
-        document.getElementById('parshaSelect').addEventListener('change', updatePrediction);
-
-        window.saveCalibration = async function() {
-            if (!homeData) { alert('אין בית משפחתי'); return; }
-            
-            const parsha = document.getElementById('parshaSelect').value;
-            const actualTime = document.getElementById('actualTime').value;
-            
-            if (!parsha) { alert('נא לבחור פרשה'); return; }
-            if (!actualTime) { alert('נא להזין זמן חזרה'); return; }
-            
-            const prediction = calculatePrediction(parsha);
-            if (!prediction) return;
-            
-            const [predHour, predMin] = prediction.time.split(':').map(Number);
-            const [actHour, actMin] = actualTime.split(':').map(Number);
-            const errorMinutes = (actHour * 60 + actMin) - (predHour * 60 + predMin);
-            
-            const newCalibration = {
-                date: new Date().toISOString().split('T')[0],
-                parsha: parsha,
-                predicted: prediction.time,
-                actual: actualTime,
-                error: errorMinutes,
-                calibratorId: currentUser.uid,
-                calibratorName: currentUser.displayName
-            };
-            
-            const GLOBAL_RATE = 0.3;
-            const CATEGORY_RATE = 0.2;
-            
-            const newGlobalOffset = (homeData.globalOffset || 0) + (errorMinutes * GLOBAL_RATE);
-            const categoryOffsets = homeData.categoryOffsets || {short:0, medium:0, long:0, very_long:0};
-            categoryOffsets[prediction.category] += errorMinutes * CATEGORY_RATE;
-            
-            const history = homeData.history || [];
-            history.unshift(newCalibration);
-            if (history.length > 52) history.splice(52);
-            
-            try {
-                await updateDoc(doc(db, 'homes', userHome), {
-                    history: history,
-                    globalOffset: newGlobalOffset,
-                    categoryOffsets: categoryOffsets,
-                    baseMinutesPerVerse: homeData.baseMinutesPerVerse || 0.918
-                });
-                
-                alert(`✅ כיוונון נשמר!\n\nשגיאה: ${errorMinutes > 0 ? '+' : ''}${errorMinutes} דקות`);
-                document.getElementById('parshaSelect').value = '';
-                document.getElementById('actualTime').value = '';
-                updatePrediction();
-            } catch (error) {
-                alert('שגיאה: ' + error.message);
-            }
-        };
-
-        function loadHistory() {
-            const historyList = document.getElementById('historyList');
-            if (!homeData || !homeData.history || homeData.history.length === 0) {
-                historyList.innerHTML = '<div class="empty-state"><p>אין עדיין היסטוריה</p><p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל כדי לראות נתונים כאן</p></div>';
-                return;
-            }
-            
-            historyList.innerHTML = homeData.history.map(item => {
-                let errorClass = 'error-zero';
-                if (item.error > 0) errorClass = 'error-positive';
-                else if (item.error < 0) errorClass = 'error-negative';
-                
-                return `
-                    <div class="history-item">
-                        <div class="history-item-header">
-                            <span class="history-parsha">${item.parsha}</span>
-                            <span class="history-date">${item.date}</span>
-                        </div>
-                        <div class="history-times">
-                            חיזוי: ${item.predicted} | בפועל: ${item.actual}
-                            <span class="error-badge ${errorClass}">${item.error > 0 ? '+' : ''}${item.error} דק'</span>
-                        </div>
-                        <div class="history-calibrator">כויל ע"י: ${item.calibratorName || 'לא ידוע'}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function loadSettings() {
-            if (homeData && homeData.startTime) {
-                document.getElementById('startTime').value = homeData.startTime;
-            }
-        }
-
-        window.saveSettings = async function() {
-            const startTime = document.getElementById('startTime').value;
-            
-            if (homeData.adminId !== currentUser.uid) {
-                alert('רק המנהל יכול לשנות הגדרות הבית');
-                return;
-            }
-            
-            try {
-                await updateDoc(doc(db, 'homes', userHome), {
-                    startTime: startTime
-                });
-                alert('✅ הגדרות נשמרו!');
-                updatePrediction();
-            } catch (error) {
-                alert('שגיאה: ' + error.message);
-            }
-        };
-
-        window.switchTab = function(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('homeTab').classList.add('hidden');
-            document.getElementById('calibrateTab').classList.add('hidden');
-            document.getElementById('historyTab').classList.add('hidden');
-            document.getElementById('settingsTab').classList.add('hidden');
-            if (tab === 'home') {
-                document.getElementById('homeTab').classList.remove('hidden');
-            } else if (tab === 'settings') {
-                document.getElementById('settingsTab').classList.remove('hidden');
-            }
-            if (tab === 'home') document.getElementById('homeTab').classList.remove('hidden');
-            else if (tab === 'calibrate') document.getElementById('calibrateTab').classList.remove('hidden');
-            else if (tab === 'history') document.getElementById('historyTab').classList.remove('hidden');
-            else if (tab === 'settings') document.getElementById('settingsTab').classList.remove('hidden');
-        };
-
-        window.showCreateHomeModal = () => {
-            document.getElementById('createHomeModal').classList.add('active');
-            document.getElementById('homeNameInput').value = '';
-        };
-
-        window.closeCreateHomeModal = () => {
-            document.getElementById('createHomeModal').classList.remove('active');
-        };
-
-        window.createHome = async () => {
-            const homeName = document.getElementById('homeNameInput').value.trim();
-            if (!homeName) { alert('נא להזין שם לבית'); return; }
-            try {
-                const homeId = 'home_' + Date.now();
-                await setDoc(doc(db, 'homes', homeId), {
-                    id: homeId,
-                    name: homeName,
-                    adminId: currentUser.uid,
-                    members: [currentUser.uid],
-                    createdAt: new Date().toISOString(),
-                    history: []
-                    history: [],
-                    baseMinutesPerVerse: 0.918,
-                    globalOffset: 0,
-                    categoryOffsets: {short:0, medium:0, long:0, very_long:0},
-                    startTime: "08:00"
-                });
-                await updateDoc(doc(db, 'users', currentUser.uid), { homeId: homeId });
-                window.closeCreateHomeModal();
-                alert('✅ הבית נוצר בהצלחה!');
-                await loadUserHome();
-            } catch (error) {
-                alert('שגיאה: ' + error.message);
-            }
-        };
-
-        window.showInviteMemberModal = () => {
-            document.getElementById('inviteMemberModal').classList.add('active');
-            document.getElementById('inviteEmailInput').value = '';
-        };
-
-        window.closeInviteMemberModal = () => {
-            document.getElementById('inviteMemberModal').classList.remove('active');
-        };
-
-        window.inviteMember = async () => {
-            const email = document.getElementById('inviteEmailInput').value.trim();
-            if (!email) { alert('נא להזין אימייל'); return; }
-            try {
-                const usersRef = collection(db, 'users');
-                const q = query(usersRef, where('email', '==', email));
-                const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) { alert('❌ המשתמש לא נמצא'); return; }
-                const invitedUser = querySnapshot.docs[0];
-                const invitedUserId = invitedUser.id;
-                const invitedUserData = invitedUser.data();
-                if (invitedUserData.homeId) { alert('❌ המשתמש כבר חבר בבית אחר'); return; }
-                if (homeData.members.includes(invitedUserId)) { alert('❌ המשתמש כבר חבר בבית'); return; }
-                await updateDoc(doc(db, 'homes', userHome), { members: arrayUnion(invitedUserId) });
-                await updateDoc(doc(db, 'users', invitedUserId), { homeId: userHome });
-                window.closeInviteMemberModal();
-                alert(`✅ ${invitedUserData.displayName} הצטרף לבית!`);
-            } catch (error) {
-                alert('שגיאה: ' + error.message);
-            }
-        };
-
-        window.removeMember = async (memberId, memberName) => {
-            if (!confirm(`האם להסיר את ${memberName}?`)) return;
-            try {
-                await updateDoc(doc(db, 'homes', userHome), { members: arrayRemove(memberId) });
-                await updateDoc(doc(db, 'users', memberId), { homeId: null });
-                alert(`✅ ${memberName} הוסר`);
-            } catch (error) {
-                alert('שגיאה: ' + error.message);
-            }
-        };
-
-        window.leaveHome = async () => {
-            if (!confirm('האם לעזוב את הבית?')) return;
-            try {
-                await updateDoc(doc(db, 'homes', userHome), { members: arrayRemove(currentUser.uid) });
-                await updateDoc(doc(db, 'users', currentUser.uid), { homeId: null });
-                alert('✅ עזבת את הבית');
-                userHome = null;
-                homeData = null;
-                await loadUserHome();
-            } catch (error) {
-                alert('שגיאה: ' + error.message);
-            }
-        };
-    </script>
-
-    </body>
-</html>
+                const option
