@@ -501,26 +501,28 @@ async function loadHomeData() {
             };
         }
 
-    function updatePrediction() {
+async function updatePrediction() {
     if (!homeData) return;
     const parshaSelect = document.getElementById('parshaSelect');
     let selectedParsha = parshaSelect.value;
     
-const parshaDisplay = document.getElementById('currentParsha');
-
-// בדיקה אם המידע חסר
-if (!selectedParsha?.hebrew) {
-    if (parshaDisplay) parshaDisplay.textContent = 'אין פרשה זמינה';
-    // כאן יבוא שאר הקוד שלך (...)
-    return; 
-}
-
-// המשך הפונקציה במידה ויש פרשה...
-if (parshaDisplay) parshaDisplay.textContent = selectedParsha.hebrew;
-
-    console.log('selectedParsha value:', selectedParsha);
-    console.log('type:', typeof selectedParsha);
-
+    console.log('updatePrediction called, selectedParsha:', selectedParsha);
+    
+    // אם אין פרשה נבחרת, נסה לקבל את פרשת השבוע
+    if (!selectedParsha) {
+        const currentParshaData = await getCurrentParsha();
+        console.log('getCurrentParsha returned:', currentParshaData);
+        
+        if (currentParshaData && currentParshaData.hebrew) {
+            selectedParsha = currentParshaData.hebrew;
+            // עדכן את ה-select
+            if (parshaSelect) {
+                parshaSelect.value = selectedParsha;
+            }
+        }
+    }
+    
+    // אם עדיין אין פרשה - הצג הודעה
     if (!selectedParsha) {
         document.getElementById('currentParsha').textContent = 'אין פרשה זמינה';
         document.getElementById('versesCount').textContent = '';
@@ -530,6 +532,7 @@ if (parshaDisplay) parshaDisplay.textContent = selectedParsha.hebrew;
         return;
     }
     
+    // המשך רגיל - selectedParsha כעת הוא string
     const prediction = calculatePrediction(selectedParsha);
     if (prediction) {
         document.getElementById('currentParsha').textContent = `פרשת ${selectedParsha}`;
