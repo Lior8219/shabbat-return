@@ -291,40 +291,29 @@
     "2026-03-20": "ויקהל-פקודי"
 };
 
-function getCurrentParsha() {
-    // תאריך נוכחי בישראל
-    const now = new Date();
-    const israelTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
-    
-    // מצא את השבת הקרובה
-    const dayOfWeek = israelTime.getDay(); // 0 = ראשון, 6 = שבת
-    let daysUntilSaturday = (6 - dayOfWeek) % 7;
-    
-    // אם היום שבת, השבת הקרובה היא היום
-    if (dayOfWeek === 6) {
-        daysUntilSaturday = 0;
-    } else if (dayOfWeek === 0 && israelTime.getHours() < 12) {
-        // אם יום ראשון לפני הצהריים, עדיין מציגים את פרשת השבת שעברה
-        daysUntilSaturday = -1;
-    }
-    
-    const saturday = new Date(israelTime);
-    saturday.setDate(israelTime.getDate() + daysUntilSaturday);
-    
-    // פורמט תאריך: YYYY-MM-DD
-    const year = saturday.getFullYear();
-    const month = String(saturday.getMonth() + 1).padStart(2, '0');
-    const day = String(saturday.getDate()).padStart(2, '0');
-    const saturdayStr = `${year}-${month}-${day}`;
-    
-    console.log('Debug getCurrentParsha:', {
-        today: israelTime.toISOString().split('T')[0],
-        saturday: saturdayStr,
-        parsha: PARSHA_DATES[saturdayStr]
-    });
-    
-    return PARSHA_DATES[saturdayStr] || null;
+async function getCurrentParsha() {
+    const today = new Date();
+    const saturday = new Date(today);
+    saturday.setDate(today.getDate() + ((6 - today.getDay() + 7) % 7));
+
+    const isoDate = saturday.toISOString().split('T')[0];
+
+    const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&geo=il&lg=he&start=${isoDate}&end=${isoDate}&maj=on&min=off&mod=off&nx=off`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const parshaEvent = data.items.find(i => i.category === 'parashat');
+
+    if (!parshaEvent) return null;
+
+    return {
+        hebrew: parshaEvent.hebrew,
+        english: parshaEvent.title,
+        date: isoDate
+    };
 }
+
         let currentUser = null;
         let userHome = null;
         let homeData = null;
@@ -517,13 +506,12 @@ async function loadHomeData() {
     const parshaSelect = document.getElementById('parshaSelect');
     let selectedParsha = parshaSelect.value;
     
-    // אם לא נבחרה פרשה, הצג את פרשת השבוע
-    if (!selectedParsha) {
-        selectedParsha = getCurrentParsha();
-        if (selectedParsha && parshaSelect) {
-            parshaSelect.value = selectedParsha;
-        }
-    }
+if (!selectedParsha?.hebrew) {
+    document.getElementById('currentParsha').textContent = 'אין פרשה זמינה';
+    ...
+    return;
+}
+
     console.log('selectedParsha value:', selectedParsha);
     console.log('type:', typeof selectedParsha);
 
