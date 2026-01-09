@@ -127,10 +127,10 @@
         </div>
         <div class="card">
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('home')">בית</button>
-                <button class="tab" onclick="switchTab('calibrate')">כיוונון</button>
-                <button class="tab" onclick="switchTab('history')">היסטוריה</button>
-                <button class="tab" onclick="switchTab('settings')">הגדרות</button>
+                <button class="tab active" onclick="switchTab(event, 'home')">בית</button>
+                <button class="tab" onclick="switchTab(event, 'calibrate')">כיוונון</button>
+                <button class="tab" onclick="switchTab(event, 'history')">היסטוריה</button>
+                <button class="tab" onclick="switchTab(event, 'settings')">הגדרות</button>
             </div>
             <div id="homeTab">
                 <div class="section-title">🏠 בית משפחתי</div>
@@ -267,20 +267,68 @@
     "2025-09-13": "נצבים-וילך",
     "2025-09-27": "האזינו",
     "2025-10-04": "וזאת הברכה"
+    "2025-10-24": "בראשית",
+    "2025-10-31": "נח",
+    "2025-11-07": "לך לך",
+    "2025-11-14": "וירא",
+    "2025-11-21": "חיי שרה",
+    "2025-11-28": "תולדות",
+    "2025-12-05": "ויצא",
+    "2025-12-12": "וישלח",
+    "2025-12-19": "וישב",
+    "2025-12-26": "מקץ",
+    "2026-01-02": "ויגש",
+    "2026-01-09": "ויחי",
+    "2026-01-16": "שמות",
+    "2026-01-23": "וארא",
+    "2026-01-30": "בא",
+    "2026-02-06": "בשלח",
+    "2026-02-13": "יתרו",
+    "2026-02-20": "משפטים",
+    "2026-02-27": "תרומה",
+    "2026-03-06": "תצוה",
+    "2026-03-13": "כי תשא",
+    "2026-03-20": "ויקהל-פקודי"
 };
 
 function getCurrentParsha() {
-    const today = new Date();
-    const saturday = new Date(today);
-    const dayOfWeek = today.getDay();
-    const daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
-    saturday.setDate(today.getDate() + daysUntilSaturday);
-    const saturdayStr = saturday.toISOString().split('T')[0];
+    // תאריך נוכחי בישראל
+    const now = new Date();
+    const israelTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+    
+    // מצא את השבת הקרובה
+    const dayOfWeek = israelTime.getDay(); // 0 = ראשון, 6 = שבת
+    let daysUntilSaturday = (6 - dayOfWeek) % 7;
+    
+    // אם היום שבת, השבת הקרובה היא היום
+    if (dayOfWeek === 6) {
+        daysUntilSaturday = 0;
+    } else if (dayOfWeek === 0 && israelTime.getHours() < 12) {
+        // אם יום ראשון לפני הצהריים, עדיין מציגים את פרשת השבת שעברה
+        daysUntilSaturday = -1;
+    }
+    
+    const saturday = new Date(israelTime);
+    saturday.setDate(israelTime.getDate() + daysUntilSaturday);
+    
+    // פורמט תאריך: YYYY-MM-DD
+    const year = saturday.getFullYear();
+    const month = String(saturday.getMonth() + 1).padStart(2, '0');
+    const day = String(saturday.getDate()).padStart(2, '0');
+    const saturdayStr = `${year}-${month}-${day}`;
+    
+    console.log('Debug getCurrentParsha:', {
+        today: israelTime.toISOString().split('T')[0],
+        saturday: saturdayStr,
+        parsha: PARSHA_DATES[saturdayStr]
+    });
+    
     return PARSHA_DATES[saturdayStr] || null;
 }
         let currentUser = null;
         let userHome = null;
         let homeData = null;
+        let homeListener = null;
 
         document.getElementById('googleLoginBtn').addEventListener('click', async () => {
             try {
@@ -344,20 +392,25 @@ function getCurrentParsha() {
             }
         }
 
-        async function loadHomeData() {
-            const homeRef = doc(db, 'homes', userHome);
-            onSnapshot(homeRef, async (homeSnap) => {
-                if (homeSnap.exists()) {
-                    homeData = homeSnap.data();
-                    await showHasHome();
-                    updatePrediction();
-                    loadHistory();
-                    loadSettings();
-                } else {
-                    showNoHome();
-                }
-            });
+async function loadHomeData() {
+    // נקה listener קודם אם קיים
+    if (homeListener) {
+        homeListener();
+    }
+    
+    const homeRef = doc(db, 'homes', userHome);
+    homeListener = onSnapshot(homeRef, async (homeSnap) => {
+        if (homeSnap.exists()) {
+            homeData = homeSnap.data();
+            await showHasHome();
+            updatePrediction();
+            loadHistory();
+            loadSettings();
+        } else {
+            showNoHome();
         }
+    });
+}
 
         function showNoHome() {
             document.getElementById('homeStatus').className = 'home-status no-home';
@@ -658,18 +711,20 @@ window.deleteCalibration = async function(index) {
             }
         };
 
-        window.switchTab = function(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('homeTab').classList.add('hidden');
-            document.getElementById('calibrateTab').classList.add('hidden');
-            document.getElementById('historyTab').classList.add('hidden');
-            document.getElementById('settingsTab').classList.add('hidden');
-            if (tab === 'home') document.getElementById('homeTab').classList.remove('hidden');
-            else if (tab === 'calibrate') document.getElementById('calibrateTab').classList.remove('hidden');
-            else if (tab === 'history') document.getElementById('historyTab').classList.remove('hidden');
-            else if (tab === 'settings') document.getElementById('settingsTab').classList.remove('hidden');
-        };
+window.switchTab = function(event, tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
+    document.getElementById('homeTab').classList.add('hidden');
+    document.getElementById('calibrateTab').classList.add('hidden');
+    document.getElementById('historyTab').classList.add('hidden');
+    document.getElementById('settingsTab').classList.add('hidden');
+    if (tab === 'home') document.getElementById('homeTab').classList.remove('hidden');
+    else if (tab === 'calibrate') document.getElementById('calibrateTab').classList.remove('hidden');
+    else if (tab === 'history') document.getElementById('historyTab').classList.remove('hidden');
+    else if (tab === 'settings') document.getElementById('settingsTab').classList.remove('hidden');
+};
 
         window.showCreateHomeModal = () => {
             document.getElementById('createHomeModal').classList.add('active');
@@ -748,19 +803,25 @@ window.deleteCalibration = async function(index) {
             }
         };
 
-        window.leaveHome = async () => {
-            if (!confirm('האם לעזוב את הבית?')) return;
-            try {
-                await updateDoc(doc(db, 'homes', userHome), { members: arrayRemove(currentUser.uid) });
-                await updateDoc(doc(db, 'users', currentUser.uid), { homeId: null });
-                alert('✅ עזבת את הבית');
-                userHome = null;
-                homeData = null;
-                await loadUserHome();
-            } catch (error) {
-                alert('שגיאה: ' + error.message);
-            }
-        };
+window.leaveHome = async () => {
+    if (!confirm('האם לעזוב את הבית?')) return;
+    try {
+        // נקה listener
+        if (homeListener) {
+            homeListener();
+            homeListener = null;
+        }
+        
+        await updateDoc(doc(db, 'homes', userHome), { members: arrayRemove(currentUser.uid) });
+        await updateDoc(doc(db, 'users', currentUser.uid), { homeId: null });
+        alert('✅ עזבת את הבית');
+        userHome = null;
+        homeData = null;
+        await loadUserHome();
+    } catch (error) {
+        alert('שגיאה: ' + error.message);
+    }
+};
     </script>
 </body>
 </html>
