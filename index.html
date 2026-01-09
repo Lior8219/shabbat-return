@@ -506,11 +506,17 @@ async function loadHomeData() {
     const parshaSelect = document.getElementById('parshaSelect');
     let selectedParsha = parshaSelect.value;
     
+const parshaDisplay = document.getElementById('currentParsha');
+
+// בדיקה אם המידע חסר
 if (!selectedParsha?.hebrew) {
-    document.getElementById('currentParsha').textContent = 'אין פרשה זמינה';
-    ...
-    return;
+    if (parshaDisplay) parshaDisplay.textContent = 'אין פרשה זמינה';
+    // כאן יבוא שאר הקוד שלך (...)
+    return; 
 }
+
+// המשך הפונקציה במידה ויש פרשה...
+if (parshaDisplay) parshaDisplay.textContent = selectedParsha.hebrew;
 
     console.log('selectedParsha value:', selectedParsha);
     console.log('type:', typeof selectedParsha);
