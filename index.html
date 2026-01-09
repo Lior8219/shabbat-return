@@ -524,7 +524,9 @@ async function loadHomeData() {
             parshaSelect.value = selectedParsha;
         }
     }
-    
+    console.log('selectedParsha value:', selectedParsha);
+    console.log('type:', typeof selectedParsha);
+
     if (!selectedParsha) {
         document.getElementById('currentParsha').textContent = 'אין פרשה זמינה';
         document.getElementById('versesCount').textContent = '';
