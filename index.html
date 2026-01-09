@@ -229,7 +229,55 @@
         const provider = new GoogleAuthProvider();
 
         const PARSHIOT = {"בראשית":146,"נח":153,"לך לך":126,"וירא":147,"חיי שרה":105,"תולדות":106,"ויצא":148,"וישלח":153,"וישב":112,"מקץ":146,"ויגש":106,"ויחי":85,"שמות":124,"וארא":121,"בא":105,"בשלח":116,"יתרו":72,"משפטים":118,"תרומה":96,"תצוה":101,"כי תשא":139,"ויקהל":122,"פקודי":92,"ויקהל-פקודי":214,"ויקרא":111,"צו":97,"שמיני":91,"תזריע":67,"מצורע":90,"תזריע-מצורע":157,"אחרי מות":80,"קדושים":64,"אחרי מות-קדושים":144,"אמור":124,"בהר":57,"בחוקתי":78,"בהר-בחוקתי":135,"במדבר":159,"נשא":176,"בהעלותך":136,"שלח":119,"קרח":95,"חקת":87,"בלק":104,"חקת-בלק":191,"פינחס":168,"מטות":112,"מסעי":132,"מטות-מסעי":244,"דברים":105,"ואתחנן":122,"עקב":111,"ראה":126,"שופטים":97,"כי תצא":110,"כי תבוא":122,"נצבים":40,"וילך":30,"נצבים-וילך":70,"האזינו":52,"וזאת הברכה":41};
+        const PARSHA_DATES = {
+    "2025-01-11": "ויגש",
+    "2025-01-18": "ויחי",
+    "2025-01-25": "שמות",
+    "2025-02-01": "וארא",
+    "2025-02-08": "בא",
+    "2025-02-15": "בשלח",
+    "2025-02-22": "יתרו",
+    "2025-03-01": "משפטים",
+    "2025-03-08": "תרומה",
+    "2025-03-15": "תצוה",
+    "2025-03-22": "כי תשא",
+    "2025-03-29": "ויקהל-פקודי",
+    "2025-04-05": "ויקרא",
+    "2025-04-12": "צו",
+    "2025-04-26": "שמיני",
+    "2025-05-03": "תזריע-מצורע",
+    "2025-05-10": "אחרי מות-קדושים",
+    "2025-05-17": "אמור",
+    "2025-05-24": "בהר-בחוקתי",
+    "2025-05-31": "במדבר",
+    "2025-06-07": "נשא",
+    "2025-06-14": "בהעלותך",
+    "2025-06-21": "שלח",
+    "2025-06-28": "קרח",
+    "2025-07-05": "חקת-בלק",
+    "2025-07-12": "פינחס",
+    "2025-07-19": "מטות-מסעי",
+    "2025-07-26": "דברים",
+    "2025-08-02": "ואתחנן",
+    "2025-08-09": "עקב",
+    "2025-08-16": "ראה",
+    "2025-08-23": "שופטים",
+    "2025-08-30": "כי תצא",
+    "2025-09-06": "כי תבוא",
+    "2025-09-13": "נצבים-וילך",
+    "2025-09-27": "האזינו",
+    "2025-10-04": "וזאת הברכה"
+};
 
+function getCurrentParsha() {
+    const today = new Date();
+    const saturday = new Date(today);
+    const dayOfWeek = today.getDay();
+    const daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
+    saturday.setDate(today.getDate() + daysUntilSaturday);
+    const saturdayStr = saturday.toISOString().split('T')[0];
+    return PARSHA_DATES[saturdayStr] || null;
+}
         let currentUser = null;
         let userHome = null;
         let homeData = null;
@@ -411,34 +459,42 @@
             };
         }
 
-        function updatePrediction() {
-            if (!homeData) return;
-            const parshaSelect = document.getElementById('parshaSelect');
-            const selectedParsha = parshaSelect.value;
-            
-            if (!selectedParsha) {
-                document.getElementById('currentParsha').textContent = 'בחר פרשה';
-                document.getElementById('versesCount').textContent = '';
-                document.getElementById('predictedTime').textContent = '--:--';
-                document.getElementById('duration').textContent = '';
-                document.getElementById('confidence').textContent = '';
-                return;
-            }
-            
-            const prediction = calculatePrediction(selectedParsha);
-            if (prediction) {
-                document.getElementById('currentParsha').textContent = `פרשת ${selectedParsha}`;
-                document.getElementById('versesCount').textContent = `${prediction.verses} פסוקים`;
-                document.getElementById('predictedTime').textContent = prediction.time;
-                document.getElementById('duration').textContent = `משך משוער: ${prediction.duration} דקות`;
-                
-                const historyCount = homeData.history ? homeData.history.length : 0;
-                let confidence = 'נמוכה';
-                if (historyCount >= 10) confidence = 'גבוהה 🎯';
-                else if (historyCount >= 5) confidence = 'בינונית 📈';
-                document.getElementById('confidence').textContent = `רמת ביטחון: ${confidence}`;
-            }
+    function updatePrediction() {
+    if (!homeData) return;
+    const parshaSelect = document.getElementById('parshaSelect');
+    let selectedParsha = parshaSelect.value;
+    
+    // אם לא נבחרה פרשה, הצג את פרשת השבוע
+    if (!selectedParsha) {
+        selectedParsha = getCurrentParsha();
+        if (selectedParsha && parshaSelect) {
+            parshaSelect.value = selectedParsha;
         }
+    }
+    
+    if (!selectedParsha) {
+        document.getElementById('currentParsha').textContent = 'אין פרשה זמינה';
+        document.getElementById('versesCount').textContent = '';
+        document.getElementById('predictedTime').textContent = '--:--';
+        document.getElementById('duration').textContent = '';
+        document.getElementById('confidence').textContent = '';
+        return;
+    }
+    
+    const prediction = calculatePrediction(selectedParsha);
+    if (prediction) {
+        document.getElementById('currentParsha').textContent = `פרשת ${selectedParsha}`;
+        document.getElementById('versesCount').textContent = `${prediction.verses} פסוקים`;
+        document.getElementById('predictedTime').textContent = prediction.time;
+        document.getElementById('duration').textContent = `משך משוער: ${prediction.duration} דקות`;
+        
+        const historyCount = homeData.history ? homeData.history.length : 0;
+        let confidence = 'נמוכה';
+        if (historyCount >= 10) confidence = 'גבוהה 🎯';
+        else if (historyCount >= 5) confidence = 'בינונית 📈';
+        document.getElementById('confidence').textContent = `רמת ביטחון: ${confidence}`;
+    }
+}
 
         document.getElementById('parshaSelect').addEventListener('change', updatePrediction);
 
@@ -496,33 +552,86 @@
             }
         };
 
-        function loadHistory() {
-            const historyList = document.getElementById('historyList');
-            if (!homeData || !homeData.history || homeData.history.length === 0) {
-                historyList.innerHTML = '<div class="empty-state"><p>אין עדיין היסטוריה</p><p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל כדי לראות נתונים כאן</p></div>';
-                return;
-            }
-            
-            historyList.innerHTML = homeData.history.map(item => {
-                let errorClass = 'error-zero';
-                if (item.error > 0) errorClass = 'error-positive';
-                else if (item.error < 0) errorClass = 'error-negative';
-                
-                return `
-                    <div class="history-item">
-                        <div class="history-item-header">
-                            <span class="history-parsha">${item.parsha}</span>
-                            <span class="history-date">${item.date}</span>
+function loadHistory() {
+    const historyList = document.getElementById('historyList');
+    if (!homeData || !homeData.history || homeData.history.length === 0) {
+        historyList.innerHTML = '<div class="empty-state"><p>אין עדיין היסטוריה</p><p style="font-size: 0.9em; margin-top: 10px;">התחל לכייל כדי לראות נתונים כאן</p></div>';
+        return;
+    }
+    
+    historyList.innerHTML = homeData.history.map((item, index) => {
+        let errorClass = 'error-zero';
+        if (item.error > 0) errorClass = 'error-positive';
+        else if (item.error < 0) errorClass = 'error-negative';
+        
+        const isAdmin = homeData.adminId === currentUser.uid;
+        const isOwner = item.calibratorId === currentUser.uid;
+        const canEdit = isAdmin || isOwner;
+        
+        return `
+            <div class="history-item">
+                <div class="history-item-header">
+                    <span class="history-parsha">${item.parsha}</span>
+                    <span class="history-date">${item.date}</span>
+                </div>
+                <div class="history-times">
+                    חיזוי: ${item.predicted} | בפועל: ${item.actual}
+                    <span class="error-badge ${errorClass}">${item.error > 0 ? '+' : ''}${item.error} דק'</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                    <div class="history-calibrator">כויל ע"י: ${item.calibratorName || 'לא ידוע'}</div>
+                    ${canEdit ? `
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="editCalibration(${index})" style="background: #e3f2fd; color: #1976d2; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85em;">✏️ ערוך</button>
+                            <button onclick="deleteCalibration(${index})" style="background: #ffebee; color: #d32f2f; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85em;">🗑️ מחק</button>
                         </div>
-                        <div class="history-times">
-                            חיזוי: ${item.predicted} | בפועל: ${item.actual}
-                            <span class="error-badge ${errorClass}">${item.error > 0 ? '+' : ''}${item.error} דק'</span>
-                        </div>
-                        <div class="history-calibrator">כויל ע"י: ${item.calibratorName || 'לא ידוע'}</div>
-                    </div>
-                `;
-            }).join('');
-        }
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+window.editCalibration = async function(index) {
+    const item = homeData.history[index];
+    const newTime = prompt(`ערוך זמן חזרה בפועל עבור ${item.parsha}:`, item.actual);
+    
+    if (!newTime || newTime === item.actual) return;
+    
+    const [predHour, predMin] = item.predicted.split(':').map(Number);
+    const [actHour, actMin] = newTime.split(':').map(Number);
+    const newError = (actHour * 60 + actMin) - (predHour * 60 + predMin);
+    
+    homeData.history[index].actual = newTime;
+    homeData.history[index].error = newError;
+    
+    try {
+        await updateDoc(doc(db, 'homes', userHome), {
+            history: homeData.history
+        });
+        alert('✅ הכיוונון עודכן!');
+        loadHistory();
+    } catch (error) {
+        alert('שגיאה: ' + error.message);
+    }
+};
+
+window.deleteCalibration = async function(index) {
+    const item = homeData.history[index];
+    if (!confirm(`האם למחוק את הכיוונון של ${item.parsha}?`)) return;
+    
+    homeData.history.splice(index, 1);
+    
+    try {
+        await updateDoc(doc(db, 'homes', userHome), {
+            history: homeData.history
+        });
+        alert('✅ הכיוונון נמחק!');
+        loadHistory();
+    } catch (error) {
+        alert('שגיאה: ' + error.message);
+    }
+};
 
         function loadSettings() {
             if (homeData && homeData.startTime) {
