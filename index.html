@@ -240,9 +240,8 @@ async function getCurrentParsha() {
         let daysToSaturday = (6 - dayOfWeek) % 7;
         
         // אם היום שבת, קח את השבת הנוכחית (0 ימים)
-        // אם היום לא שבת, קח את השבת הבאה
         if (dayOfWeek === 6) {
-            daysToSaturday = 0; // שבת נוכחית
+            daysToSaturday = 0;
         } else if (daysToSaturday === 0) {
             daysToSaturday = 7; // שבת הבאה (אם היום ראשון)
         }
@@ -256,7 +255,8 @@ async function getCurrentParsha() {
         const day = String(saturday.getDate()).padStart(2, '0');
         const isoDate = `${year}-${month}-${day}`;
 
-        const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&geo=il&lg=he&start=${isoDate}&end=${isoDate}&maj=on&min=off&mod=off&nx=off`;
+        // ⬇️ פרמטרים מעודכנים - בקש גם sedrot (פרשיות)
+        const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&geo=il&lg=he&start=${isoDate}&end=${isoDate}&s=on`;
 
         console.log('Today:', today.toISOString().split('T')[0], 'Day of week:', dayOfWeek);
         console.log('Days to Saturday:', daysToSaturday);
@@ -268,10 +268,24 @@ async function getCurrentParsha() {
 
         console.log('Hebcal response:', data);
 
+        // חפש אירוע מסוג parashat (פרשה)
         const parshaEvent = data.items?.find(i => i.category === 'parashat');
 
         if (!parshaEvent) {
-            console.warn('No parsha found for date:', isoDate);
+            console.warn('⚠ No parsha found for date:', isoDate);
+            console.log('Available items:', data.items?.map(i => i.category));
+            
+            // אולי יש Torah reading אחר?
+            const torahReading = data.items?.find(i => i.torah);
+            if (torahReading) {
+                console.log('Found Torah reading:', torahReading);
+                return {
+                    hebrew: torahReading.hebrew || torahReading.title,
+                    english: torahReading.title,
+                    date: isoDate
+                };
+            }
+            
             return null;
         }
 
