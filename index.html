@@ -234,28 +234,48 @@
 async function getCurrentParsha() {
     try {
         const today = new Date();
+        
+        // חשב את תאריך השבת הקרובה
+        const dayOfWeek = today.getDay(); // 0 = ראשון, 6 = שבת
+        let daysToSaturday = (6 - dayOfWeek) % 7;
+        
+        // אם היום שבת, קח את השבת הנוכחית (0 ימים)
+        // אם היום לא שבת, קח את השבת הבאה
+        if (dayOfWeek === 6) {
+            daysToSaturday = 0; // שבת נוכחית
+        } else if (daysToSaturday === 0) {
+            daysToSaturday = 7; // שבת הבאה (אם היום ראשון)
+        }
+        
         const saturday = new Date(today);
-        saturday.setDate(today.getDate() + ((6 - today.getDay() + 7) % 7));
-
-        const isoDate = saturday.toISOString().split('T')[0];
+        saturday.setDate(today.getDate() + daysToSaturday);
+        
+        // פורמט ISO (YYYY-MM-DD)
+        const year = saturday.getFullYear();
+        const month = String(saturday.getMonth() + 1).padStart(2, '0');
+        const day = String(saturday.getDate()).padStart(2, '0');
+        const isoDate = `${year}-${month}-${day}`;
 
         const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&geo=il&lg=he&start=${isoDate}&end=${isoDate}&maj=on&min=off&mod=off&nx=off`;
 
-        console.log('Fetching from Hebcal:', url);
+        console.log('Today:', today.toISOString().split('T')[0], 'Day of week:', dayOfWeek);
+        console.log('Days to Saturday:', daysToSaturday);
+        console.log('Fetching parsha for Saturday:', isoDate);
+        console.log('Hebcal URL:', url);
 
         const res = await fetch(url);
         const data = await res.json();
 
         console.log('Hebcal response:', data);
 
-        const parshaEvent = data.items.find(i => i.category === 'parashat');
+        const parshaEvent = data.items?.find(i => i.category === 'parashat');
 
         if (!parshaEvent) {
             console.warn('No parsha found for date:', isoDate);
             return null;
         }
 
-        console.log('Found parsha:', parshaEvent.hebrew);
+        console.log('✅ Found parsha:', parshaEvent.hebrew);
 
         return {
             hebrew: parshaEvent.hebrew,
@@ -263,7 +283,7 @@ async function getCurrentParsha() {
             date: isoDate
         };
     } catch (error) {
-        console.error('Error in getCurrentParsha:', error);
+        console.error('❌ Error in getCurrentParsha:', error);
         return null;
     }
 }
