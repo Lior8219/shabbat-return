@@ -502,7 +502,11 @@ async function updatePrediction() {
         console.log('getCurrentParsha returned:', currentParshaData);
         
         if (currentParshaData && currentParshaData.hebrew) {
-            selectedParsha = currentParshaData.hebrew;
+            // הסר את המילה "פרשת" אם קיימת
+            selectedParsha = currentParshaData.hebrew.replace(/^פרשת\s+/, '');
+            
+            console.log('Cleaned parsha name:', selectedParsha);
+            
             // עדכן את ה-select (אם הפרשה קיימת ברשימה)
             if (parshaSelect && PARSHIOT[selectedParsha]) {
                 parshaSelect.value = selectedParsha;
@@ -520,8 +524,9 @@ async function updatePrediction() {
         return;
     }
     
-    // המשך רגיל - selectedParsha כעת הוא string
+    // המשך רגיל - selectedParsha כעת הוא string נקי (בלי "פרשת")
     const prediction = calculatePrediction(selectedParsha);
+    
     if (prediction) {
         document.getElementById('currentParsha').textContent = `פרשת ${selectedParsha}`;
         document.getElementById('versesCount').textContent = `${prediction.verses} פסוקים`;
@@ -534,11 +539,12 @@ async function updatePrediction() {
         else if (historyCount >= 5) confidence = 'בינונית 📈';
         document.getElementById('confidence').textContent = `רמת ביטחון: ${confidence}`;
     } else {
-        // במקרה שהפרשה לא קיימת ב-PARSHIOT (למשל פרשות מחוברות)
+        // במקרה שהפרשה לא קיימת ב-PARSHIOT
+        console.warn('⚠ Parsha not found in PARSHIOT:', selectedParsha);
         document.getElementById('currentParsha').textContent = `פרשת ${selectedParsha}`;
         document.getElementById('versesCount').textContent = 'מידע לא זמין';
         document.getElementById('predictedTime').textContent = '--:--';
-        document.getElementById('duration').textContent = '';
+        document.getElementById('duration').textContent = 'פרשה לא מוכרת במערכת';
         document.getElementById('confidence').textContent = '';
     }
 }
