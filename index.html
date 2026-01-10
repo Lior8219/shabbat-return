@@ -229,135 +229,39 @@
         const provider = new GoogleAuthProvider();
 
         const PARSHIOT = {"בראשית":146,"נח":153,"לך לך":126,"וירא":147,"חיי שרה":105,"תולדות":106,"ויצא":148,"וישלח":153,"וישב":112,"מקץ":146,"ויגש":106,"ויחי":85,"שמות":124,"וארא":121,"בא":105,"בשלח":116,"יתרו":72,"משפטים":118,"תרומה":96,"תצוה":101,"כי תשא":139,"ויקהל":122,"פקודי":92,"ויקהל-פקודי":214,"ויקרא":111,"צו":97,"שמיני":91,"תזריע":67,"מצורע":90,"תזריע-מצורע":157,"אחרי מות":80,"קדושים":64,"אחרי מות-קדושים":144,"אמור":124,"בהר":57,"בחוקתי":78,"בהר-בחוקתי":135,"במדבר":159,"נשא":176,"בהעלותך":136,"שלח":119,"קרח":95,"חקת":87,"בלק":104,"חקת-בלק":191,"פינחס":168,"מטות":112,"מסעי":132,"מטות-מסעי":244,"דברים":105,"ואתחנן":122,"עקב":111,"ראה":126,"שופטים":97,"כי תצא":110,"כי תבוא":122,"נצבים":40,"וילך":30,"נצבים-וילך":70,"האזינו":52,"וזאת הברכה":41};
-        const PARSHA_DATES = {
-    "2025-01-11": "ויגש",
-    "2025-01-18": "ויחי",
-    "2025-01-25": "שמות",
-    "2025-02-01": "וארא",
-    "2025-02-08": "בא",
-    "2025-02-15": "בשלח",
-    "2025-02-22": "יתרו",
-    "2025-03-01": "משפטים",
-    "2025-03-08": "תרומה",
-    "2025-03-15": "תצוה",
-    "2025-03-22": "כי תשא",
-    "2025-03-29": "ויקהל-פקודי",
-    "2025-04-05": "ויקרא",
-    "2025-04-12": "צו",
-    "2025-04-26": "שמיני",
-    "2025-05-03": "תזריע-מצורע",
-    "2025-05-10": "אחרי מות-קדושים",
-    "2025-05-17": "אמור",
-    "2025-05-24": "בהר-בחוקתי",
-    "2025-05-31": "במדבר",
-    "2025-06-07": "נשא",
-    "2025-06-14": "בהעלותך",
-    "2025-06-21": "שלח",
-    "2025-06-28": "קרח",
-    "2025-07-05": "חקת-בלק",
-    "2025-07-12": "פינחס",
-    "2025-07-19": "מטות-מסעי",
-    "2025-07-26": "דברים",
-    "2025-08-02": "ואתחנן",
-    "2025-08-09": "עקב",
-    "2025-08-16": "ראה",
-    "2025-08-23": "שופטים",
-    "2025-08-30": "כי תצא",
-    "2025-09-06": "כי תבוא",
-    "2025-09-13": "נצבים-וילך",
-    "2025-09-27": "האזינו",
-    "2025-10-04": "וזאת הברכה",
-    "2025-10-24": "בראשית",
-    "2025-10-31": "נח",
-    "2025-11-07": "לך לך",
-    "2025-11-14": "וירא",
-    "2025-11-21": "חיי שרה",
-    "2025-11-28": "תולדות",
-    "2025-12-05": "ויצא",
-    "2025-12-12": "וישלח",
-    "2025-12-19": "וישב",
-    "2025-12-26": "מקץ",
-    "2026-01-02": "ויגש",
-    "2026-01-09": "ויחי",
-    "2026-01-16": "שמות",
-    "2026-01-23": "וארא",
-    "2026-01-30": "בא",
-    "2026-02-06": "בשלח",
-    "2026-02-13": "יתרו",
-    "2026-02-20": "משפטים",
-    "2026-02-27": "תרומה",
-    "2026-03-06": "תצוה",
-    "2026-03-13": "כי תשא",
-    "2026-03-20": "ויקהל-פקודי"
-};
+        
 
 async function getCurrentParsha() {
     try {
-        // תאריך נוכחי בישראל
-        const now = new Date();
-        const israelTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
-        
-        console.log('Current Israel time:', israelTime);
-        
-        // מצא את השבת הקרובה
-        const dayOfWeek = israelTime.getDay(); // 0 = ראשון, 6 = שבת
-        let daysUntilSaturday = (6 - dayOfWeek) % 7;
-        
-        // אם היום שבת, השבת הקרובה היא היום
-        if (dayOfWeek === 6) {
-            daysUntilSaturday = 0;
-        } else if (dayOfWeek === 0 && israelTime.getHours() < 12) {
-            // אם יום ראשון לפני הצהריים, עדיין מציגים את פרשת השבת שעברה
-            daysUntilSaturday = -1;
-        }
-        
-        const saturday = new Date(israelTime);
-        saturday.setDate(israelTime.getDate() + daysUntilSaturday);
-        
-        // פורמט תאריך: YYYY-MM-DD
-        const year = saturday.getFullYear();
-        const month = String(saturday.getMonth() + 1).padStart(2, '0');
-        const day = String(saturday.getDate()).padStart(2, '0');
-        const saturdayStr = `${year}-${month}-${day}`;
-        
-        console.log('Looking for parsha on date:', saturdayStr);
-        console.log('Found in PARSHA_DATES:', PARSHA_DATES[saturdayStr]);
-        
-        // חפש ב-PARSHA_DATES הקיים
-        const parshaName = PARSHA_DATES[saturdayStr];
-        
-        if (parshaName) {
-            return {
-                hebrew: parshaName,
-                english: parshaName,
-                date: saturdayStr
-            };
-        }
-        
-        // אם לא נמצא - נסה עם Hebcal API
-        console.log('Parsha not found in local data, trying Hebcal API...');
-        
-        const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&geo=il&lg=he&start=${saturdayStr}&end=${saturdayStr}&maj=on&min=off&mod=off&nx=off`;
-        console.log('Fetching from:', url);
-        
+        const today = new Date();
+        const saturday = new Date(today);
+        saturday.setDate(today.getDate() + ((6 - today.getDay() + 7) % 7));
+
+        const isoDate = saturday.toISOString().split('T')[0];
+
+        const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&geo=il&lg=he&start=${isoDate}&end=${isoDate}&maj=on&min=off&mod=off&nx=off`;
+
+        console.log('Fetching from Hebcal:', url);
+
         const res = await fetch(url);
         const data = await res.json();
-        
-        console.log('Hebcal API response:', data);
-        
+
+        console.log('Hebcal response:', data);
+
         const parshaEvent = data.items.find(i => i.category === 'parashat');
-        
-        if (parshaEvent) {
-            return {
-                hebrew: parshaEvent.hebrew,
-                english: parshaEvent.title,
-                date: saturdayStr
-            };
+
+        if (!parshaEvent) {
+            console.warn('No parsha found for date:', isoDate);
+            return null;
         }
-        
-        console.warn('No parsha found for date:', saturdayStr);
-        return null;
-        
+
+        console.log('Found parsha:', parshaEvent.hebrew);
+
+        return {
+            hebrew: parshaEvent.hebrew,
+            english: parshaEvent.title,
+            date: isoDate
+        };
     } catch (error) {
         console.error('Error in getCurrentParsha:', error);
         return null;
@@ -565,8 +469,8 @@ async function updatePrediction() {
         
         if (currentParshaData && currentParshaData.hebrew) {
             selectedParsha = currentParshaData.hebrew;
-            // עדכן את ה-select
-            if (parshaSelect) {
+            // עדכן את ה-select (אם הפרשה קיימת ברשימה)
+            if (parshaSelect && PARSHIOT[selectedParsha]) {
                 parshaSelect.value = selectedParsha;
             }
         }
@@ -595,6 +499,13 @@ async function updatePrediction() {
         if (historyCount >= 10) confidence = 'גבוהה 🎯';
         else if (historyCount >= 5) confidence = 'בינונית 📈';
         document.getElementById('confidence').textContent = `רמת ביטחון: ${confidence}`;
+    } else {
+        // במקרה שהפרשה לא קיימת ב-PARSHIOT (למשל פרשות מחוברות)
+        document.getElementById('currentParsha').textContent = `פרשת ${selectedParsha}`;
+        document.getElementById('versesCount').textContent = 'מידע לא זמין';
+        document.getElementById('predictedTime').textContent = '--:--';
+        document.getElementById('duration').textContent = '';
+        document.getElementById('confidence').textContent = '';
     }
 }
 
