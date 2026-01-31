@@ -130,6 +130,7 @@
                 <button class="tab active" onclick="switchTab(event, 'home')">בית</button>
                 <button class="tab" onclick="switchTab(event, 'calibrate')">כיוונון</button>
                 <button class="tab" onclick="switchTab(event, 'history')">היסטוריה</button>
+                <button class="tab" onclick="switchTab(event, 'learning')">למידה</button>
                 <button class="tab" onclick="switchTab(event, 'settings')">הגדרות</button>
             </div>
             <div id="homeTab">
@@ -170,6 +171,10 @@
             <div id="historyTab" class="hidden">
                 <div class="section-title">📊 היסטוריית כיוונונים</div>
                 <div id="historyList"></div>
+            </div>
+            <div id="learningTab" class="hidden">
+                <div class="section-title">🎓 נתוני למידה</div>
+                <div id="learningData"></div>
             </div>
             <div id="settingsTab" class="hidden">
                 <div class="section-title">⚙️ הגדרות</div>
@@ -645,6 +650,129 @@ function loadHistory() {
     }).join('');
 }
 
+function loadLearning() {
+    const learningData = document.getElementById('learningData');
+    
+    if (!homeData) {
+        learningData.innerHTML = '<div class="empty-state"><p>אין נתוני למידה</p></div>';
+        return;
+    }
+    
+    const historyCount = homeData.history ? homeData.history.length : 0;
+    const globalOffset = homeData.globalOffset || 0;
+    const categoryOffsets = homeData.categoryOffsets || {short:0, medium:0, long:0, very_long:0};
+    const baseMinutesPerVerse = homeData.baseMinutesPerVerse || 0.918;
+    
+    // חישוב דיוק ממוצע
+    let avgError = 0;
+    if (historyCount > 0) {
+        const totalError = homeData.history.reduce((sum, item) => sum + Math.abs(item.error), 0);
+        avgError = (totalError / historyCount).toFixed(1);
+    }
+    
+    // ספירת כיוונונים לפי קטגוריה
+    const categoryCount = {short: 0, medium: 0, long: 0, very_long: 0};
+    if (homeData.history) {
+        homeData.history.forEach(item => {
+            const verses = PARSHIOT[item.parsha];
+            if (verses) {
+                if (verses < 80) categoryCount.short++;
+                else if (verses < 140) categoryCount.medium++;
+                else if (verses < 180) categoryCount.long++;
+                else categoryCount.very_long++;
+            }
+        });
+    }
+    
+    // רמת ביטחון
+    let confidence = 'נמוכה 📉';
+    let confidenceColor = '#ff9800';
+    if (historyCount >= 10) {
+        confidence = 'גבוהה 🎯';
+        confidenceColor = '#4caf50';
+    } else if (historyCount >= 5) {
+        confidence = 'בינונית 📈';
+        confidenceColor = '#2196f3';
+    }
+    
+    learningData.innerHTML = `
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; text-align: center;">
+            <div style="font-size: 3em; font-weight: bold; margin-bottom: 10px;">${historyCount}</div>
+            <div style="font-size: 1.2em; opacity: 0.9;">כיוונונים סה"כ</div>
+            <div style="font-size: 2em; margin-top: 15px; font-weight: bold;">${avgError} דק'</div>
+            <div style="opacity: 0.9;">דיוק ממוצע</div>
+            <div style="display: inline-block; background: rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 20px; margin-top: 15px; font-size: 1.1em;">
+                רמת ביטחון: ${confidence}
+            </div>
+        </div>
+        
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+            <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.3em;">⚙️ פרמטרי למידה</h3>
+            <div style="display: grid; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; padding: 12px; background: white; border-radius: 8px;">
+                    <span style="color: #666;">קיזוז גלובלי:</span>
+                    <strong style="color: ${globalOffset >= 0 ? '#4caf50' : '#f44336'};">${globalOffset >= 0 ? '+' : ''}${globalOffset.toFixed(1)} דק'</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 12px; background: white; border-radius: 8px;">
+                    <span style="color: #666;">זמן בסיס לפסוק:</span>
+                    <strong style="color: #667eea;">${baseMinutesPerVerse.toFixed(3)} דק'</strong>
+                </div>
+            </div>
+        </div>
+        
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+            <h3 style="color: #667eea; margin-bottom: 15px; font-size: 1.3em;">📁 קיזוזים לפי קטגוריה</h3>
+            <div style="display: grid; gap: 10px;">
+                <div style="padding: 15px; background: white; border-radius: 10px; border-right: 4px solid #4caf50;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span style="font-weight: bold; color: #333;">פרשות קצרות (<80 פסוקים)</span>
+                        <strong style="color: ${categoryOffsets.short >= 0 ? '#4caf50' : '#f44336'}; font-size: 1.1em;">${categoryOffsets.short >= 0 ? '+' : ''}${categoryOffsets.short.toFixed(1)} דק'</strong>
+                    </div>
+                    <div style="font-size: 0.9em; color: #999;">${categoryCount.short} כיוונונים</div>
+                </div>
+                
+                <div style="padding: 15px; background: white; border-radius: 10px; border-right: 4px solid #2196f3;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span style="font-weight: bold; color: #333;">פרשות בינוניות (80-140)</span>
+                        <strong style="color: ${categoryOffsets.medium >= 0 ? '#4caf50' : '#f44336'}; font-size: 1.1em;">${categoryOffsets.medium >= 0 ? '+' : ''}${categoryOffsets.medium.toFixed(1)} דק'</strong>
+                    </div>
+                    <div style="font-size: 0.9em; color: #999;">${categoryCount.medium} כיוונונים</div>
+                </div>
+                
+                <div style="padding: 15px; background: white; border-radius: 10px; border-right: 4px solid #ff9800;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span style="font-weight: bold; color: #333;">פרשות ארוכות (140-180)</span>
+                        <strong style="color: ${categoryOffsets.long >= 0 ? '#4caf50' : '#f44336'}; font-size: 1.1em;">${categoryOffsets.long >= 0 ? '+' : ''}${categoryOffsets.long.toFixed(1)} דק'</strong>
+                    </div>
+                    <div style="font-size: 0.9em; color: #999;">${categoryCount.long} כיוונונים</div>
+                </div>
+                
+                <div style="padding: 15px; background: white; border-radius: 10px; border-right: 4px solid #f44336;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                        <span style="font-weight: bold; color: #333;">פרשות ארוכות מאוד (>180)</span>
+                        <strong style="color: ${categoryOffsets.very_long >= 0 ? '#4caf50' : '#f44336'}; font-size: 1.1em;">${categoryOffsets.very_long >= 0 ? '+' : ''}${categoryOffsets.very_long.toFixed(1)} דק'</strong>
+                    </div>
+                    <div style="font-size: 0.9em; color: #999;">${categoryCount.very_long} כיוונונים</div>
+                </div>
+            </div>
+        </div>
+        
+        ${historyCount < 5 ? `
+        <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); padding: 15px; border-radius: 10px; border-right: 4px solid #ff9800;">
+            <div style="font-weight: bold; color: #f57c00; margin-bottom: 5px;">💡 טיפ</div>
+            <div style="color: #666; font-size: 0.95em;">כדי לשפר את הדיוק, מומלץ לבצע לפחות 5 כיוונונים. יש לך כרגע ${historyCount}.</div>
+        </div>
+        ` : ''}
+        
+        ${categoryCount.long === 0 && historyCount >= 5 ? `
+        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 15px; border-radius: 10px; border-right: 4px solid #2196f3; margin-top: 15px;">
+            <div style="font-weight: bold; color: #1976d2; margin-bottom: 5px;">📌 המלצה</div>
+            <div style="color: #666; font-size: 0.95em;">אין לך עדיין כיוונונים לפרשות ארוכות (140-180 פסוקים). נסה לכייל פרשה כזו לדיוק טוב יותר!</div>
+        </div>
+        ` : ''}
+    `;
+}
+
 window.editCalibration = async function(index) {
     const item = homeData.history[index];
     const newTime = prompt(`ערוך זמן חזרה בפועל עבור ${item.parsha}:`, item.actual);
@@ -719,10 +847,19 @@ window.switchTab = function(event, tab) {
     document.getElementById('homeTab').classList.add('hidden');
     document.getElementById('calibrateTab').classList.add('hidden');
     document.getElementById('historyTab').classList.add('hidden');
+    document.getElementById('learningTab').classList.add('hidden');
     document.getElementById('settingsTab').classList.add('hidden');
+    
     if (tab === 'home') document.getElementById('homeTab').classList.remove('hidden');
     else if (tab === 'calibrate') document.getElementById('calibrateTab').classList.remove('hidden');
-    else if (tab === 'history') document.getElementById('historyTab').classList.remove('hidden');
+    else if (tab === 'history') { 
+        document.getElementById('historyTab').classList.remove('hidden');
+        loadHistory();
+    }
+    else if (tab === 'learning') {
+        document.getElementById('learningTab').classList.remove('hidden');
+        loadLearning();
+    }
     else if (tab === 'settings') document.getElementById('settingsTab').classList.remove('hidden');
 };
 
