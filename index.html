@@ -511,6 +511,8 @@ async function updatePrediction() {
         if (currentParshaData && currentParshaData.hebrew) {
             // הסר את המילה "פרשת" אם קיימת
             selectedParsha = currentParshaData.hebrew.replace(/^פרשת\s+/, '');
+            // המר מקף עברי למקף רגיל
+            selectedParsha = selectedParsha.replace(/־/g, '-');
             
             console.log('Cleaned parsha name:', selectedParsha);
             
