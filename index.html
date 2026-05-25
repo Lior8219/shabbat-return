@@ -263,7 +263,7 @@ async function getCurrentParsha() {
         const isoDate = `${year}-${month}-${day}`;
 
         // ⬇️ פרמטרים מעודכנים - בקש גם sedrot (פרשיות)
-        const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&geo=il&lg=he&start=${isoDate}&end=${isoDate}&s=on`;
+        const url = `https://www.hebcal.com/hebcal?v=1&cfg=json&lg=he&start=${isoDate}&end=${isoDate}&s=on&i=on`;
 
         console.log('Today:', today.toISOString().split('T')[0], 'Day of week:', dayOfWeek);
         console.log('Days to Saturday:', daysToSaturday);
