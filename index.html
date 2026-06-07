@@ -236,6 +236,26 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        const PARSHA_EN_TO_HE = {
+    "Bereshit":"בראשית","Noach":"נח","Lech-Lecha":"לך לך","Vayera":"וירא",
+    "Chayei Sara":"חיי שרה","Toldot":"תולדות","Vayetzei":"ויצא","Vayishlach":"וישלח",
+    "Vayeshev":"וישב","Miketz":"מקץ","Vayigash":"ויגש","Vayechi":"ויחי",
+    "Shemot":"שמות","Vaera":"וארא","Bo":"בא","Beshalach":"בשלח",
+    "Yitro":"יתרו","Mishpatim":"משפטים","Terumah":"תרומה","Tetzaveh":"תצוה",
+    "Ki Tisa":"כי תשא","Vayakhel":"ויקהל","Pekudei":"פקודי","Vayakhel-Pekudei":"ויקהל-פקודי",
+    "Vayikra":"ויקרא","Tzav":"צו","Shmini":"שמיני","Tazria":"תזריע",
+    "Metzora":"מצורע","Tazria-Metzora":"תזריע-מצורע","Achrei Mot":"אחרי מות",
+    "Kedoshim":"קדושים","Achrei Mot-Kedoshim":"אחרי מות-קדושים","Emor":"אמור",
+    "Behar":"בהר","Bechukotai":"בחוקתי","Behar-Bechukotai":"בהר-בחוקתי",
+    "Bamidbar":"במדבר","Nasso":"נשא","Beha'alotcha":"בהעלותך","Shelach":"שלח",
+    "Korach":"קרח","Chukat":"חקת","Balak":"בלק","Chukat-Balak":"חקת-בלק",
+    "Pinchas":"פינחס","Matot":"מטות","Masei":"מסעי","Matot-Masei":"מטות-מסעי",
+    "Devarim":"דברים","Vaetchanan":"ואתחנן","Eikev":"עקב","Re'eh":"ראה",
+    "Shoftim":"שופטים","Ki Teitzei":"כי תצא","Ki Tavo":"כי תבוא",
+    "Nitzavim":"נצבים","Vayeilech":"וילך","Nitzavim-Vayeilech":"נצבים-וילך",
+    "Ha'Azinu":"האזינו","Vezot Haberakhah":"וזאת הברכה"
+};
+
         const PARSHIOT = {"בראשית":146,"נח":153,"לך לך":126,"וירא":147,"חיי שרה":105,"תולדות":106,"ויצא":148,"וישלח":153,"וישב":112,"מקץ":146,"ויגש":106,"ויחי":85,"שמות":124,"וארא":121,"בא":105,"בשלח":116,"יתרו":72,"משפטים":118,"תרומה":96,"תצוה":101,"כי תשא":139,"ויקהל":122,"פקודי":92,"ויקהל-פקודי":214,"ויקרא":111,"צו":97,"שמיני":91,"תזריע":67,"מצורע":90,"תזריע-מצורע":157,"תזריע-מצרע":157,"אחרי מות":80,"קדושים":64,"אחרי מות-קדושים":144,"אחרי מות-קדשים":144,"אמור":124,"בהר":57,"בחוקתי":78,"בהר-בחוקתי":135,"בהר-בחקתי":135,"במדבר":159,"נשא":176,"בהעלותך":136,"בהעלתך":136,"שלח":119,"שלח-לך":119,"קרח":95,"קרה":95,"קורה":95,"חקת":87,"בלק":104,"חקת-בלק":191,"פינחס":168,"מטות":112,"מסעי":132,"מטות-מסעי":244,"דברים":105,"ואתחנן":122,"עקב":111,"ראה":126,"שופטים":97,"כי תצא":110,"כי תבוא":122,"נצבים":40,"וילך":30,"נצבים-וילך":70,"האזינו":52,"וזאת הברכה":41};
     async function getCurrentParsha() {
     try {
@@ -295,11 +315,13 @@
             return null;
         }
 
-        console.log('✅ Found parsha:', parshaEvent.hebrew);
-
+        console.log('✅ Found parsha:', parshaEvent.title_orig);
+        const englishName = parshaEvent.title_orig.replace('Parashat ', '');
+        const hebrewName = PARSHA_EN_TO_HE[englishName] || parshaEvent.hebrew;
+        console.log('Mapped to Hebrew:', hebrewName);
         return {
-            hebrew: parshaEvent.hebrew,
-            english: parshaEvent.title,
+            hebrew: hebrewName,
+            english: englishName,
             date: isoDate
         };
     } catch (error) {
